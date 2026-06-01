@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% block title %}Estadísticas Personales{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Estadísticas Personales</h2>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Dashboard</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Fecha Inicio:</label>
+                        <input type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio }}">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Fecha Fin:</label>
+                        <input type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin }}">
+                    </div>
+                    <div class="col-12 col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-3">
+        <div class="card text-white bg-info h-100">
+            <div class="card-body">
+                <h5 class="card-title">Total Apuestas</h5>
+                <p class="card-text fs-4">{{ total_apuestas }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body">
+                <h5 class="card-title">Total Ventas</h5>
+                <p class="card-text fs-4">${{ total_ventas|floatformat:0 }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="card text-white bg-warning h-100">
+            <div class="card-body">
+                <h5 class="card-title">Comisión Estimada</h5>
+                <p class="card-text fs-4">${{ comision_estimada|floatformat:0 }}</p>
+                <small>{{ porcentaje_comision }}%</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="card text-white bg-danger h-100">
+            <div class="card-body">
+                <h5 class="card-title">Premios Potenciales</h5>
+                <p class="card-text fs-4">${{ total_premios_potenciales|floatformat:0 }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Números Más Jugados</h5>
+            </div>
+            <div class="card-body">
+                {% if numeros_frecuentes %}
+                <div class="row g-2">
+                    {% for numero, count in numeros_frecuentes %}
+                    <div class="col-4 col-md-2">
+                        <div class="alert alert-primary mb-0 text-center">
+                            <strong>{{ numero }}</strong><br>
+                            <small>{{ count }} veces</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No hay datos disponibles</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Loterías Favoritas</h5>
+            </div>
+            <div class="card-body">
+                {% if loterias_frecuentes %}
+                <div class="row g-2">
+                    {% for loteria, count in loterias_frecuentes %}
+                    <div class="col-6">
+                        <div class="alert alert-secondary mb-0">
+                            <strong>{{ loteria }}</strong><br>
+                            <small>{{ count }} apuestas</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No hay datos disponibles</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Ventas por Día de la Semana</h5>
+            </div>
+            <div class="card-body">
+                {% if ventas_por_dia %}
+                <div class="row g-2">
+                    {% for dia, monto in ventas_por_dia.items %}
+                    <div class="col-6">
+                        <div class="alert alert-info mb-0">
+                            <strong>{{ dia }}</strong><br>
+                            <small>${{ monto|floatformat:0 }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No hay datos disponibles</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Apuestas por Cifras</h5>
+            </div>
+            <div class="card-body">
+                {% if apuestas_por_cifras %}
+                <div class="row g-2">
+                    {% for cifras, count in apuestas_por_cifras.items %}
+                    <div class="col-4">
+                        <div class="alert alert-dark mb-0 text-center">
+                            <strong>{{ cifras }} cifras</strong><br>
+                            <small>{{ count }} apuestas</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No hay datos disponibles</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Ventas Últimos 7 Días</h5>
+            </div>
+            <div class="card-body">
+                {% if ventas_por_fecha %}
+                <div class="row g-2">
+                    {% for fecha, monto in ventas_por_fecha.items %}
+                    <div class="col-4 col-md-2">
+                        <div class="alert alert-success mb-0 text-center">
+                            <strong>{{ fecha|date:"m/d" }}</strong><br>
+                            <small>${{ monto|floatformat:0 }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No hay datos disponibles</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

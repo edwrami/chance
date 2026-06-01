@@ -1,0 +1,234 @@
+﻿/* ============================================================================
+   PERSONALIZACIÓN COMPLETA DEL ADMIN DE CHANCEPRO
+   ============================================================================ */
+
+/* Cabecera principal */
+#header {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+    color: white !important;
+    border-bottom: 3px solid #0f2744 !important;
+    padding: 15px 20px !important;
+}
+
+#branding h1, #branding h1 a {
+    color: white !important;
+    font-size: 1.8rem;
+    font-weight: 300;
+    text-decoration: none;
+    letter-spacing: 1px;
+}
+
+#user-tools {
+    color: rgba(255,255,255,0.9) !important;
+    font-size: 0.9rem;
+}
+
+#user-tools a {
+    color: rgba(255,255,255,0.8) !important;
+    border-bottom: 1px dotted rgba(255,255,255,0.3);
+    margin-left: 10px;
+    text-decoration: none;
+}
+
+#user-tools a:hover {
+    color: white !important;
+    border-bottom: 1px solid white;
+}
+
+/* Módulos y títulos */
+.module h2, .module caption, .inline-group h2 {
+    background: #2a5298 !important;
+    color: white !important;
+    font-weight: 400 !important;
+    padding: 10px 15px !important;
+    border-radius: 5px 5px 0 0;
+    font-size: 1.1rem;
+}
+
+.module, .dashboard-module {
+    border-radius: 8px !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1) !important;
+    border: 1px solid #e0e0e0 !important;
+    margin-bottom: 20px !important;
+    background: white !important;
+}
+
+/* Botones */
+.button, input[type=submit], input[type=button], .submit-row input {
+    background: #1e3c72 !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 5px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover {
+    background: #2a5298 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.button.default, input[type=submit].default {
+    background: #2a5298 !important;
+    font-weight: 600 !important;
+    padding: 12px 25px !important;
+}
+
+.button.default:hover {
+    background: #1e3c72 !important;
+}
+
+/* Enlaces */
+a:link, a:visited {
+    color: #1e3c72 !important;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #2a5298 !important;
+    text-decoration: underline;
+}
+
+/* Tablas */
+#result_list {
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08) !important;
+    border: 1px solid #e0e0e0 !important;
+}
+
+#result_list thead th {
+    background: #f5f7fa !important;
+    color: #1e3c72 !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid #1e3c72 !important;
+    padding: 12px 8px !important;
+    font-size: 0.95rem;
+}
+
+#result_list tbody tr {
+    border-bottom: 1px solid #eee !important;
+}
+
+#result_list tbody tr:nth-child(even) {
+    background: #fafbfc !important;
+}
+
+#result_list tbody tr:hover {
+    background: #e8f0fe !important;
+}
+
+/* Barra de navegación lateral */
+.module#nav-sidebar {
+    background: white !important;
+    border-right: 1px solid #ddd !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+#nav-sidebar .current-model {
+    background: #e8f0fe !important;
+    border-left: 4px solid #1e3c72 !important;
+}
+
+#nav-sidebar th a {
+    color: #1e3c72 !important;
+    font-weight: 500 !important;
+    padding: 10px !important;
+    display: block;
+}
+
+#nav-sidebar .current-app .section {
+    background: #1e3c72 !important;
+    color: white !important;
+}
+
+/* Footer personalizado */
+#footer {
+    background: #f8f9fa !important;
+    border-top: 3px solid #1e3c72 !important;
+    color: #666 !important;
+    text-align: center !important;
+    padding: 20px !important;
+    margin-top: 30px !important;
+    font-size: 0.9rem;
+    clear: both;
+}
+
+/* Ocultar cualquier referencia a Django */
+.quiet, .version, .django-version, .c-django-version {
+    display: none !important;
+}
+
+/* Personalizar el dashboard */
+.dashboard #content {
+    background: white !important;
+    padding: 25px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08) !important;
+    margin-top: 20px !important;
+}
+
+.dashboard .module table th {
+    background: #f5f7fa !important;
+    color: #1e3c72 !important;
+    font-weight: 600 !important;
+}
+
+/* Formularios */
+.aligned label {
+    color: #333 !important;
+    font-weight: 500 !important;
+    width: 160px !important;
+}
+
+.help {
+    color: #666 !important;
+    font-size: 0.85rem !important;
+}
+
+/* Errores */
+.errorlist {
+    background: #fee !important;
+    color: #c33 !important;
+    padding: 8px 15px !important;
+    border-radius: 5px !important;
+    border-left: 4px solid #c33 !important;
+    margin: 10px 0 !important;
+    list-style: none;
+}
+
+/* Paginador */
+.paginator {
+    background: #f5f7fa !important;
+    padding: 15px !important;
+    border-radius: 5px !important;
+    margin-top: 20px !important;
+}
+
+.paginator a, .paginator .this-page {
+    padding: 5px 12px !important;
+    border-radius: 3px !important;
+}
+
+.paginator a {
+    background: white !important;
+    border: 1px solid #ddd !important;
+    color: #1e3c72 !important;
+}
+
+.paginator a:hover {
+    background: #e8f0fe !important;
+}
+
+.paginator .this-page {
+    background: #1e3c72 !important;
+    color: white !important;
+    font-weight: bold !important;
+}

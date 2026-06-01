@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Limpieza Completada{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Limpieza Completada</h2>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Dashboard</a>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Resultado de la Limpieza</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <h4>✅ Limpieza completada exitosamente</h4>
+                </div>
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <div class="alert alert-info">
+                            <strong>Apuestas eliminadas:</strong> {{ apuestas_eliminadas }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="alert alert-warning">
+                            <strong>Acumulados eliminados:</strong> {{ acumulados_eliminados }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="alert alert-secondary">
+                            <strong>Liquidaciones eliminadas:</strong> {{ liquidaciones_eliminadas }}
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-success mt-3">
+                    <strong>Total registros eliminados:</strong> {{ total_eliminado }}
+                </div>
+                <a href="{% url 'dashboard' %}" class="btn btn-primary mt-3">Volver al Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

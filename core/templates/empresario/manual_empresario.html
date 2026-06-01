@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% block title %}Manual de Uso - Empresario{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Manual de Uso - Empresario</h2>
+    <a href="{% url 'empresario_dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Volver</a>
+</div>
+
+<div class="accordion" id="manualAccordion">
+    <!-- Sección 1: Gestión de Loterías -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#loterias">
+                1. Gestión de Loterías
+            </button>
+        </h2>
+        <div id="loterias" class="accordion-collapse collapse show" data-bs-parent="#manualAccordion">
+            <div class="accordion-body">
+                <h5>Crear una Nueva Lotería</h5>
+                <ol>
+                    <li>Ve a "Mis Loterías" en el dashboard</li>
+                    <li>Haz clic en "+ Nueva Lotería"</li>
+                    <li>Completa los datos: nombre, hora de sorteo, días de sorteo</li>
+                    <li>Guarda la lotería</li>
+                </ol>
+                
+                <h5>Activar/Desactivar Lotería</h5>
+                <p>Usa el botón de toggle en la lista de loterías para activar o desactivar una lotería. Las loterías desactivadas no estarán disponibles para apuestas.</p>
+                
+                <h5>Editar Lotería</h5>
+                <p>Haz clic en el nombre de la lotería para editar sus datos.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección 2: Planes de Premio -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#planes">
+                2. Planes de Premio
+            </button>
+        </h2>
+        <div id="planes" class="accordion-collapse collapse" data-bs-parent="#manualAccordion">
+            <div class="accordion-body">
+                <h5>Configurar Plan de Premio</h5>
+                <p>El plan de premio define cuánto se paga por cada peso apostado según las cifras y tipo de apuesta.</p>
+                
+                <h6>Tipos de Apuesta:</h6>
+                <ul>
+                    <li><strong>Pleno:</strong> Apostar al número exacto</li>
+                    <li><strong>Combinado:</strong> Apostar a cualquier combinación de las cifras</li>
+                </ul>
+                
+                <h6>Configuración:</h6>
+                <ol>
+                    <li>Ve a "Planes de Premio"</li>
+                    <li>Selecciona la lotería</li>
+                    <li>Configura el premio por peso para cada cantidad de cifras (2-6)</li>
+                    <li>Configura si es pleno o combinado</li>
+                    <li>Guarda los cambios</li>
+                </ol>
+                
+                <div class="alert alert-info">
+                    <strong>Ejemplo:</strong> Si configuras 100 para 4 cifras pleno, apostando $1 al número 1234 pagará $100 si gana.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección 3: Topes de Números -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#topes">
+                3. Topes de Números
+            </button>
+        </h2>
+        <div id="topes" class="accordion-collapse collapse" data-bs-parent="#manualAccordion">
+            <div class="accordion-body">
+                <h5>¿Qué son los Topes?</h5>
+                <p>Los topes limitan el monto máximo de premios que se pueden pagar por cada número en cada lotería. Esto protege tu negocio de pérdidas excesivas.</p>
+                
+                <h5>Configurar Tope</h5>
+                <ol>
+                    <li>Ve a "Topes de Números"</li>
+                    <li>Haz clic en "+ Nuevo Tope"</li>
+                    <li>Selecciona la lotería</li>
+                    <li>Define el tope máximo de premio</li>
+                    <li>Guarda</li>
+                </ol>
+                
+                <div class="alert alert-warning">
+                    <strong>Importante:</strong> El sistema rechazará automáticamente cualquier apuesta que exceda el tope configurado.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección 4: Gestión de Chanceros -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#chanceros">
+                4. Gestión de Chanceros
+            </button>
+        </h2>
+        <div id="chanceros" class="accordion-collapse collapse" data-bs-parent="#manualAccordion">
+            <div class="accordion-body">
+                <h5>Crear Chancero</h5>
+                <ol>
+                    <li>Ve a "Mis Chanceros"</li>
+                    <li>Haz clic en "+ Nuevo Chancero"</li>
+                    <li>Completa los datos personales</li>
+                    <li>Define el porcentaje de comisión</li>
+                    <li>Guarda</li>
+                </ol>
+                
+                <h5>Comisión del Chancero</h5>
+                <p>La comisión es el porcentaje de las ventas que recibe el chancero. Por ejemplo, si configuras 10%, el chancero recibe $10 por cada $100 en ventas.</p>
+                
+                <h5>Activar/Desactivar Chancero</h5>
+                <p>Usa el botón de toggle para activar o desactivar chanceros. Los chanceros desactivados no pueden realizar apuestas.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección 5: Ventas y Reportes -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ventas">
+                5. Ventas y Reportes
+            </button>
+        </h2>
+        <div id="ventas" class="accordion-collapse collapse" data-bs-parent="#manualAccordion">
+            <div class="accordion-body">
+                <h5>Ver Ventas</h5>
+                <p>En "Ventas" puedes ver todas las apuestas realizadas, filtrar por fecha, lotería y chancero.</p>
+                
+                <h5>Exportar a Excel</h5>
+                <ol>
+                    <li>Ve a "Ventas"</li>
+                    <li>Aplica los filtros necesarios</li>
+                    <li>Haz clic en "Exportar a Excel"</li>
+                    <li>El archivo se descargará automáticamente</li>
+                </ol>
+                
+                <h5>Ver Acumulados</h5>
+                <p>En "Acumulados" puedes ver el estado actual de los topes de cada número y lotería.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección 6: Resultados -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#resultados">
+                6. Registrar Resultados
+            </button>
+        </h2>
+        <div id="resultados" class="accordion-collapse collapse" data-bs-parent="#manualAccordion">
+            <div class="accordion-body">
+                <h5>Registrar Resultado de Sorteo</h5>
+                <ol>
+                    <li>Ve a "Registrar Resultados"</li>
+                    <li>Selecciona la lotería</li>
+                    <li>Selecciona la fecha del sorteo</li>
+                    <li>Ingresa el número ganador</li>
+                    <li>Guarda</li>
+                </ol>
+                
+                <div class="alert alert-info">
+                    <strong>Automático:</strong> Al guardar el resultado, el sistema calculará automáticamente los premios ganados y actualizará el estado de las apuestas.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

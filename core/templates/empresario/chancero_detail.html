@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}Detalle Chancero{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Detalle del Chancero</h2>
+    <div class="d-flex flex-column flex-md-row gap-2">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Dashboard</a>
+        <a href="{% url 'chanceros_list' %}" class="btn btn-secondary w-100 w-md-auto">Volver a Chanceros</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Información del Chancero</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <p><strong>Documento:</strong> {{ chancero.documento }}</p>
+                        <p><strong>Nombre:</strong> {{ chancero.nombres }} {{ chancero.apellidos }}</p>
+                        <p><strong>Teléfono:</strong> {{ chancero.telefono }}</p>
+                        <p><strong>Dirección:</strong> {{ chancero.direccion }}</p>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <p><strong>Email:</strong> {{ chancero.email|default:'No registrado' }}</p>
+                        <p><strong>Teléfono Familiar:</strong> {{ chancero.telefono_familiar }}</p>
+                        <p><strong>Comisión:</strong> {{ porcentaje_comision|default:0 }}%</p>
+                        <p><strong>Estado:</strong>
+                            {% if chancero.activo %}
+                            <span class="badge bg-success">Activo</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactivo</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex flex-column flex-md-row gap-2">
+                            <form method="post" action="{% url 'chancero_toggle' chancero.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-warning w-100 w-md-auto">
+                                    {% if chancero.activo %}Desactivar{% else %}Activar{% endif %}
+                                </button>
+                            </form>
+                            <button type="button" class="btn btn-info w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#editarModal">Editar Información</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar información -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Chancero</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'chancero_update' chancero.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Nombres:</label>
+                        <input type="text" name="nombres" class="form-control" value="{{ chancero.nombres }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Apellidos:</label>
+                        <input type="text" name="apellidos" class="form-control" value="{{ chancero.apellidos }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Teléfono:</label>
+                        <input type="text" name="telefono" class="form-control" value="{{ chancero.telefono }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Dirección:</label>
+                        <input type="text" name="direccion" class="form-control" value="{{ chancero.direccion }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email:</label>
+                        <input type="email" name="email" class="form-control" value="{{ chancero.email|default:'' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Teléfono Familiar:</label>
+                        <input type="text" name="telefono_familiar" class="form-control" value="{{ chancero.telefono_familiar }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Comisión (%):</label>
+                        <input type="number" name="comision" class="form-control" value="{{ porcentaje_comision|floatformat:2 }}" min="0" max="100" step="0.1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña Actual:</label>
+                        <input type="password" name="password_actual" class="form-control" placeholder="Dejar en blanco si no desea cambiar">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nueva Contraseña (dejar en blanco para no cambiar):</label>
+                        <input type="password" name="password" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

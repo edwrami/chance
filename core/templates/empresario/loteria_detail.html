@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Detalle Lotería{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Detalle de Lotería</h2>
+    <div class="d-flex flex-column flex-md-row gap-2">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Dashboard</a>
+        <a href="{% url 'loterias_list' %}" class="btn btn-secondary w-100 w-md-auto">Volver a Loterías</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Información de la Lotería</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <p><strong>Nombre:</strong> {{ loteria.nombre }}</p>
+                        <p><strong>Horario de Apertura:</strong> {{ loteria.hora_apertura }}</p>
+                        <p><strong>Horario de Cierre:</strong> {{ loteria.hora_cierre }}</p>
+                        <p><strong>Estado:</strong>
+                            {% if loteria.activa %}
+                            <span class="badge bg-success">Activa</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactiva</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <p><strong>Fecha Creación:</strong> {{ loteria.created_at|date:"Y-m-d" }}</p>
+                        <p><strong>Tope de Premio:</strong> ${{ loteria.tope_premio|floatformat:0 }}</p>
+                        <p><strong>Días Habilitados:</strong>
+                            {% if loteria.dias_habilitados %}
+                            {{ loteria.dias_habilitados|join:", " }}
+                            {% else %}
+                            No configurado
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

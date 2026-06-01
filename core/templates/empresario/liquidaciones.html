@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Liquidaciones{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Liquidaciones de Chanceros</h2>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Volver al Dashboard</a>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Historial de Liquidaciones</h5>
+            </div>
+            <div class="card-body">
+                {% if liquidaciones %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Chancero</th>
+                                <th>Fecha Inicio</th>
+                                <th>Fecha Fin</th>
+                                <th>Total Ventas</th>
+                                <th>Comisión %</th>
+                                <th>Valor Comisión</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for liquidacion in liquidaciones %}
+                            <tr>
+                                <td>{{ liquidacion.chancero.nombres }} {{ liquidacion.chancero.apellidos }}</td>
+                                <td>{{ liquidacion.fecha_inicio }}</td>
+                                <td>{{ liquidacion.fecha_fin }}</td>
+                                <td>${{ liquidacion.total_ventas|floatformat:0 }}</td>
+                                <td>{{ liquidacion.porcentaje_comision|floatformat:2 }}%</td>
+                                <td>${{ liquidacion.comision_valor|floatformat:0 }}</td>
+                                <td>
+                                    {% if liquidacion.estado == 'solicitada' %}
+                                    <span class="badge bg-warning">Solicitada</span>
+                                    {% elif liquidacion.estado == 'pagada' %}
+                                    <span class="badge bg-success">Pagada</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Cancelada</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if liquidacion.estado == 'solicitada' %}
+                                    <form method="post" action="{% url 'liquidacion_pagar' liquidacion.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-success w-100 w-md-auto">Marcar como Pagada</button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No hay liquidaciones registradas.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

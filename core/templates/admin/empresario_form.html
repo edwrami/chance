@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Editar Empresario{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+    <h2>Editar Empresario</h2>
+    <a href="{% url 'empresario_detail' empresario.id %}" class="btn btn-secondary">Volver</a>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Información del Empresario</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Documento (Usuario):</label>
+                        <input type="text" name="documento" class="form-control" value="{{ empresario.documento }}" required>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label>Nombres:</label>
+                        <input type="text" name="nombres" class="form-control" value="{{ empresario.nombres }}" required>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label>Apellidos:</label>
+                        <input type="text" name="apellidos" class="form-control" value="{{ empresario.apellidos }}" required>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label>Email:</label>
+                        <input type="email" name="email" class="form-control" value="{{ empresario.email }}">
+                    </div>
+                    <div class="form-group mt-3">
+                        <label>Teléfono:</label>
+                        <input type="text" name="telefono" class="form-control" value="{{ empresario.telefono }}" required>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label>Teléfono Familiar:</label>
+                        <input type="text" name="telefono_familiar" class="form-control" value="{{ empresario.telefono_familiar }}" required>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label>Dirección:</label>
+                        <textarea name="direccion" class="form-control" rows="3">{{ empresario.direccion }}</textarea>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label>Nueva Contraseña (dejar vacío para mantener la actual):</label>
+                        <input type="text" name="password" class="form-control" placeholder="Contraseña actual: {{ empresario.password }}">
+                    </div>
+                    <div class="form-group mt-3">
+                        <label>Límite de Chanceros:</label>
+                        <input type="number" name="limite_chanceros" class="form-control" value="{{ empresario.limite_chanceros }}" required>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label>
+                            <input type="checkbox" name="activo" {% if empresario.activo %}checked{% endif %}>
+                            Usuario Activo
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-4">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

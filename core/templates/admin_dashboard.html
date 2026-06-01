@@ -1,0 +1,81 @@
+﻿{% extends 'base.html' %}
+{% block title %}Panel Admin{% endblock %}
+{% block content %}
+<h2>Panel de Administrador General</h2>
+<p class="text-muted">Bienvenido, {{ user.nombres }} {{ user.apellidos }}</p>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Empresarios Registrados</h5>
+                <a href="{% url 'empresario_create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus"></i> Nuevo Empresario
+                </a>
+            </div>
+            <div class="card-body">
+                {% if ultimos_empresarios %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Documento</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Estado</th>
+                            <th>Fecha Registro</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for empresario in ultimos_empresarios %}
+                        <tr>
+                            <td>{{ empresario.documento }}</td>
+                            <td>{{ empresario.nombres }} {{ empresario.apellidos }}</td>
+                            <td>{{ empresario.email }}</td>
+                            <td>{{ empresario.telefono }}</td>
+                            <td>
+                                {% if empresario.activo %}
+                                <span class="badge badge-success">Activo</span>
+                                {% else %}
+                                <span class="badge badge-danger">Suspendido</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ empresario.created_at|date:"Y-m-d" }}</td>
+                            <td>
+                                <a href="{% url 'empresario_detail' empresario.id %}" class="btn btn-sm btn-info">Ver</a>
+                                <form method="post" action="{% url 'empresario_toggle' empresario.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-warning">
+                                        {% if empresario.activo %}Suspender{% else %}Activar{% endif %}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted">No hay empresarios registrados aún.</p>
+                <a href="{% url 'empresario_create' %}" class="btn btn-primary">Crear Primer Empresario</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Mi Cuenta</h5>
+            </div>
+            <div class="card-body">
+                <a href="{% url 'cambiar_contrasena' %}" class="btn btn-secondary">
+                    <i class="bi bi-key"></i> Cambiar Mi Contraseña
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

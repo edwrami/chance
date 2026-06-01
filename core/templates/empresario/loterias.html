@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Mis Loterías{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Mis Loterías</h2>
+    <div class="d-flex flex-column flex-md-row gap-2">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Dashboard</a>
+        <a href="{% url 'loteria_create' %}" class="btn btn-primary w-100 w-md-auto">Crear Lotería</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Lista de Loterías</h5>
+            </div>
+            <div class="card-body">
+                {% if loterias %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Días Habilitados</th>
+                                <th>Horario</th>
+                                <th>Tope Premio</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loteria in loterias %}
+                            <tr>
+                                <td>{{ loteria.nombre }}</td>
+                                <td>
+                                    {% if loteria.dias_habilitados %}
+                                    {{ loteria.dias_habilitados|join:", " }}
+                                    {% else %}
+                                    No configurado
+                                    {% endif %}
+                                </td>
+                                <td>{{ loteria.hora_apertura }} - {{ loteria.hora_cierre }}</td>
+                                <td>${{ loteria.tope_premio|floatformat:0 }}</td>
+                                <td>
+                                    {% if loteria.activa %}
+                                    <span class="badge bg-success">Activa</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Inactiva</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1 flex-wrap">
+                                        <a href="{% url 'loteria_detail' loteria.id %}" class="btn btn-sm btn-info">Ver</a>
+                                        <form method="post" action="{% url 'loteria_toggle' loteria.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-warning">
+                                                {% if loteria.activa %}Desactivar{% else %}Activar{% endif %}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No tienes loterías configuradas.</p>
+                <a href="{% url 'loteria_create' %}" class="btn btn-primary w-100 w-md-auto">Crear Primera Lotería</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

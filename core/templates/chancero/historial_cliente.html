@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block title %}Historial de Cliente{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Historial: {{ cliente.nombre }}</h2>
+    <a href="{% url 'agenda_clientes' %}" class="btn btn-secondary w-100 w-md-auto">Volver a Agenda</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Información del Cliente</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-md-4">
+                        <strong>Nombre:</strong> {{ cliente.nombre }}
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <strong>Teléfono:</strong> {{ cliente.telefono }}
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <strong>Dirección:</strong> {{ cliente.direccion|default:"-" }}
+                    </div>
+                </div>
+                {% if cliente.notas %}
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <strong>Notas:</strong> {{ cliente.notas }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Estadísticas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-3">
+                        <div class="alert alert-info mb-0">
+                            <strong>Total Apuestas:</strong> {{ total_apuestas }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="alert alert-success mb-0">
+                            <strong>Total Apostado:</strong> ${{ total_apostado|floatformat:0 }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="alert alert-warning mb-0">
+                            <strong>Premios Potenciales:</strong> ${{ total_premios|floatformat:0 }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="alert alert-secondary mb-0">
+                            <strong>Promedio por Apuesta:</strong> ${{ total_apostado|floatformat:0 }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if numeros_frecuentes %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Números Más Jugados</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for numero, count in numeros_frecuentes %}
+                    <div class="col-12 col-md-2">
+                        <div class="alert alert-primary mb-0 text-center">
+                            <strong>{{ numero }}</strong><br>
+                            <small>{{ count }} veces</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Historial de Apuestas</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Lotería</th>
+                                <th>Número</th>
+                                <th>Cifras</th>
+                                <th>Monto</th>
+                                <th>Premio</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for h in historial %}
+                            <tr>
+                                <td>{{ h.apuesta.fecha_hora|date:"Y-m-d H:i" }}</td>
+                                <td>{{ h.apuesta.loteria.nombre }}</td>
+                                <td>{{ h.apuesta.numero }}</td>
+                                <td>{{ h.apuesta.cifras }}</td>
+                                <td>${{ h.apuesta.monto_apostado|floatformat:0 }}</td>
+                                <td>${{ h.apuesta.premio_potencial|floatformat:0 }}</td>
+                                <td>
+                                    <span class="badge bg-{{ h.apuesta.estado|default:'secondary' }}">
+                                        {{ h.apuesta.estado|default:"Activa" }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">No hay apuestas registradas</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Mis Chanceros{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Mis Chanceros</h2>
+    <div class="d-flex flex-column flex-md-row gap-2">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Dashboard</a>
+        <a href="{% url 'chancero_create' %}" class="btn btn-primary w-100 w-md-auto">Crear Chancero</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Lista de Chanceros</h5>
+            </div>
+            <div class="card-body">
+                {% if chanceros %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Documento</th>
+                                <th>Nombre</th>
+                                <th>Teléfono</th>
+                                <th>Comisión</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in chanceros_data %}
+                            <tr>
+                                <td>{{ item.chancero.documento }}</td>
+                                <td>{{ item.chancero.nombres }} {{ item.chancero.apellidos }}</td>
+                                <td>{{ item.chancero.telefono }}</td>
+                                <td>{{ item.porcentaje_comision|floatformat:2|default:0 }}%</td>
+                                <td>
+                                    {% if item.chancero.activo %}
+                                    <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1 flex-wrap">
+                                        <a href="{% url 'chancero_detail' item.chancero.id %}" class="btn btn-sm btn-info">Ver</a>
+                                        <form method="post" action="{% url 'chancero_toggle' item.chancero.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-warning">
+                                                {% if item.chancero.activo %}Desactivar{% else %}Activar{% endif %}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No tienes chanceros configurados.</p>
+                <a href="{% url 'chancero_create' %}" class="btn btn-primary w-100 w-md-auto">Crear Primer Chancero</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

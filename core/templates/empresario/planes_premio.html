@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% block title %}Planes de Premio{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Planes de Premio</h2>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Volver</a>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Configurar Premios (Aplica para todas las loterías)</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Cifras</th>
+                                <th>Tipo</th>
+                                <th>Premio por Peso Apostado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2 cifras</td>
+                                <td>Directo (Pleno)</td>
+                                <td>
+                                    <input type="number" class="form-control premio-input" 
+                                           data-cifras="2" data-combinado="false" 
+                                           placeholder="Monto por peso" step="0.01">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2 cifras</td>
+                                <td>Combinado</td>
+                                <td>
+                                    <input type="number" class="form-control premio-input" 
+                                           data-cifras="2" data-combinado="true" 
+                                           placeholder="Monto por peso" step="0.01">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3 cifras</td>
+                                <td>Directo</td>
+                                <td>
+                                    <input type="number" class="form-control premio-input" 
+                                           data-cifras="3" data-combinado="false" 
+                                           placeholder="Monto por peso" step="0.01">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3 cifras</td>
+                                <td>Combinado</td>
+                                <td>
+                                    <input type="number" class="form-control premio-input" 
+                                           data-cifras="3" data-combinado="true" 
+                                           placeholder="Monto por peso" step="0.01">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>4 cifras</td>
+                                <td>Directo</td>
+                                <td>
+                                    <input type="number" class="form-control premio-input" 
+                                           data-cifras="4" data-combinado="false" 
+                                           placeholder="Monto por peso" step="0.01">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>4 cifras</td>
+                                <td>Combinado</td>
+                                <td>
+                                    <input type="number" class="form-control premio-input" 
+                                           data-cifras="4" data-combinado="true" 
+                                           placeholder="Monto por peso" step="0.01">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>5 cifras</td>
+                                <td>Directo</td>
+                                <td>
+                                    <input type="number" class="form-control premio-input" 
+                                           data-cifras="5" data-combinado="false" 
+                                           placeholder="Monto por peso" step="0.01">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>5 cifras</td>
+                                <td>Combinado</td>
+                                <td>
+                                    <input type="number" class="form-control premio-input" 
+                                           data-cifras="5" data-combinado="true" 
+                                           placeholder="Monto por peso" step="0.01">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>6 cifras</td>
+                                <td>Directo</td>
+                                <td>
+                                    <input type="number" class="form-control premio-input" 
+                                           data-cifras="6" data-combinado="false" 
+                                           placeholder="Monto por peso" step="0.01">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>6 cifras</td>
+                                <td>Combinado</td>
+                                <td>
+                                    <input type="number" class="form-control premio-input" 
+                                           data-cifras="6" data-combinado="true" 
+                                           placeholder="Monto por peso" step="0.01">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button id="guardarPlanes" class="btn btn-primary mt-3 w-100 w-md-auto">Guardar Planes de Premio</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Cargar planes al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    cargarPlanes();
+});
+
+function cargarPlanes() {
+    fetch('/api/planes-premio/')
+        .then(response => response.json())
+        .then(data => {
+            document.querySelectorAll('.premio-input').forEach(input => {
+                const cifras = input.dataset.cifras;
+                const combinado = input.dataset.combinado === 'true';
+                const plan = data.find(p => p.cifras == cifras && p.es_combinado == combinado);
+                if (plan) {
+                    input.value = plan.premio_por_peso;
+                } else {
+                    input.value = '';
+                }
+            });
+        });
+}
+
+document.getElementById('guardarPlanes').addEventListener('click', function() {
+    const planes = [];
+    
+    document.querySelectorAll('.premio-input').forEach(input => {
+        const cifras = input.dataset.cifras;
+        const combinado = input.dataset.combinado === 'true';
+        const premio = input.value;
+        
+        if (premio) {
+            planes.push({
+                cifras: cifras,
+                es_combinado: combinado,
+                premio_por_peso: premio
+            });
+        }
+    });
+    
+    planes.forEach(plan => {
+        fetch('{% url "plan_update" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: new URLSearchParams(plan)
+        });
+    });
+    
+    alert('Planes de premio guardados exitosamente');
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

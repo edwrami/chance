@@ -1,0 +1,240 @@
+﻿{% extends 'base.html' %}
+{% block title %}Panel Empresario{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Panel de Empresario</h2>
+    <div class="d-flex flex-column flex-md-row gap-2">
+        <a href="{% url 'manual_empresario' %}" class="btn btn-info w-100 w-md-auto">Manual de Uso</a>
+        <a href="{% url 'cambiar_contrasena' %}" class="btn btn-secondary w-100 w-md-auto">Cambiar Contraseña</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card text-white bg-primary h-100">
+            <div class="card-body">
+                <h5 class="card-title">Ventas Hoy</h5>
+                <p class="card-text fs-4">${{ ventas_hoy|floatformat:0 }}</p>
+                <small class="text-white">{{ apuestas_count }} apuestas</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body">
+                <h5 class="card-title">Caja Hoy</h5>
+                <p class="card-text fs-4">${{ caja_hoy|floatformat:0 }}</p>
+                <small class="text-white">Ventas - Premios</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-white bg-info h-100">
+            <div class="card-body">
+                <h5 class="card-title">Chanceros</h5>
+                <p class="card-text fs-4">{{ chanceros_activos }}/{{ total_chanceros }}</p>
+                <small class="text-white">Activos / Total</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-white bg-warning h-100">
+            <div class="card-body">
+                <h5 class="card-title">Loterías</h5>
+                <p class="card-text fs-4">{{ loterias_activas }}</p>
+                <small class="text-white">Activas</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <h5 class="mb-2 mb-md-0">Mis Chanceros</h5>
+                <a href="{% url 'chancero_create' %}" class="btn btn-sm btn-primary w-100 w-md-auto">Crear Chancero</a>
+            </div>
+            <div class="card-body">
+                {% if top_chanceros %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Ventas Hoy</th>
+                                <th>Apuestas</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for chancero in top_chanceros %}
+                            <tr>
+                                <td>{{ chancero.nombres }} {{ chancero.apellidos }}</td>
+                                <td>${{ chancero.ventas_hoy|floatformat:0|default:0 }}</td>
+                                <td>{{ chancero.apuestas_hoy|default:0 }}</td>
+                                <td>
+                                    {% if chancero.activo %}
+                                    <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'chancero_detail' chancero.id %}" class="btn btn-sm btn-info">Ver</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No tienes chanceros registrados.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <h5 class="mb-2 mb-md-0">Liquidaciones Pendientes</h5>
+                <a href="{% url 'liquidaciones_solicitar' %}" class="btn btn-sm btn-success w-100 w-md-auto">Solicitar Liquidación</a>
+            </div>
+            <div class="card-body">
+                <h3>{{ liquidaciones_pendientes }} pendientes</h3>
+                <p class="text-muted">Valor total: ${{ valor_liquidaciones_pendientes|floatformat:0|default:0 }}</p>
+                <a href="{% url 'liquidaciones_list' %}" class="btn btn-primary w-100 w-md-auto">Ver Todas</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <h5 class="mb-2 mb-md-0">Consultas y Reportes</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <a href="{% url 'acumulados' %}" class="btn btn-info w-100">Ver Acumulados por Número</a>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <a href="{% url 'consultar_numero' %}" class="btn btn-secondary w-100">Consultar Número</a>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <a href="{% url 'ventas_list' %}" class="btn btn-secondary w-100">Ver Ventas</a>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <a href="{% url 'reportes_chancero' %}" class="btn btn-primary w-100">Reportes por Chancero</a>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <a href="{% url 'ganancias' %}" class="btn btn-success w-100">Ganancias por Fechas</a>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <a href="{% url 'liquidaciones_chancero' %}" class="btn btn-warning w-100">Liquidaciones por Chancero</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <h5 class="mb-2 mb-md-0">Gestión de Datos</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <a href="{% url 'configuracion_retencion' %}" class="btn btn-secondary w-100">Configurar Retención de Datos</a>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <a href="{% url 'limpiar_datos' %}" class="btn btn-danger w-100">Limpiar Datos Antiguos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <h5 class="mb-2 mb-md-0">Loterías Activas Hoy</h5>
+                <a href="{% url 'loterias_list' %}" class="btn btn-sm btn-primary w-100 w-md-auto">Ver Todas</a>
+            </div>
+            <div class="card-body">
+                {% if loterias_hoy %}
+                <div class="row g-3">
+                    {% for loteria in loterias_hoy %}
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="card h-100 border-primary">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ loteria.nombre }}</h6>
+                                <p class="card-text">
+                                    <strong>Horario:</strong> {{ loteria.hora_apertura }} - {{ loteria.hora_cierre }}<br>
+                                    <strong>Tope Premio:</strong> ${{ loteria.tope_premio|floatformat:0 }}<br>
+                                    <strong>Días:</strong> {{ loteria.dias_habilitados|join:", " }}
+                                </p>
+                                <a href="{% url 'loteria_detail' loteria.id %}" class="btn btn-sm btn-primary w-100">Visitar</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No hay loterías activas para hoy.</p>
+                <a href="{% url 'loteria_create' %}" class="btn btn-primary w-100 w-md-auto">Crear Lotería</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Configuración</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <h6>Límite de Chanceros</h6>
+                        <p>{{ user.limite_chanceros }} chanceros permitidos</p>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <h6>Tipos de Apuestas Autorizados</h6>
+                        <p>
+                            {% if user.autorizar_2c_directo %}2C Directo{% endif %}
+                            {% if user.autorizar_2c_combinado %}2C Combinado{% endif %}
+                            {% if user.autorizar_3c_directo %}3C Directo{% endif %}
+                            {% if user.autorizar_3c_combinado %}3C Combinado{% endif %}
+                            {% if user.autorizar_4c_directo %}4C Directo{% endif %}
+                            {% if user.autorizar_4c_combinado %}4C Combinado{% endif %}
+                            {% if user.autorizar_5c_directo %}5C Directo{% endif %}
+                            {% if user.autorizar_5c_combinado %}5C Combinado{% endif %}
+                            {% if user.autorizar_6c_directo %}6C Directo{% endif %}
+                            {% if user.autorizar_6c_combinado %}6C Combinado{% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div class="row g-3 mt-3">
+                    <div class="col-12 col-md-6">
+                        <a href="{% url 'empresario_config' %}" class="btn btn-secondary w-100 w-md-auto">Configurar Cifras</a>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <a href="{% url 'planes_list' %}" class="btn btn-primary w-100 w-md-auto">Configurar Planes de Premio</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

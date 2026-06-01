@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% block title %}Manual de Uso - Chancero{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Manual de Uso - Chancero</h2>
+    <a href="{% url 'informacion_chancero' %}" class="btn btn-secondary w-100 w-md-auto">Volver</a>
+</div>
+
+<div class="accordion" id="manualAccordion">
+    <!-- Sección 1: Realizar Apuestas -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#apuestas">
+                1. Realizar Apuestas
+            </button>
+        </h2>
+        <div id="apuestas" class="accordion-collapse collapse show" data-bs-parent="#manualAccordion">
+            <div class="accordion-body">
+                <h5>Pasos para Realizar una Apuesta</h5>
+                <ol>
+                    <li>Selecciona la fecha de la apuesta</li>
+                    <li>Selecciona la lotería disponible para esa fecha</li>
+                    <li>Ingresa el número a apostar (2-6 cifras)</li>
+                    <li>Ingresa el monto a apostar</li>
+                    <li>Marca "Combinado" si deseas apostar a todas las combinaciones de las cifras</li>
+                    <li>Haz clic en "+ Agregar" para agregar al resumen</li>
+                    <li>Puedes agregar múltiples números antes de enviar</li>
+                    <li>Haz clic en "Realizar Apuestas" para enviar</li>
+                </ol>
+                
+                <h5>Opciones de Envío</h5>
+                <p>Al hacer clic en "Realizar Apuestas" verás 3 opciones:</p>
+                <ul>
+                    <li><strong>Enviar por WhatsApp:</strong> Abre WhatsApp con el detalle de las apuestas para enviar al cliente</li>
+                    <li><strong>Enviar por SMS:</strong> Abre la aplicación de mensajes con el detalle de las apuestas</li>
+                    <li><strong>Realizar sin enviar:</strong> Procesa las apuestas sin enviar mensaje</li>
+                </ul>
+                
+                <div class="alert alert-info">
+                    <strong>Tip:</strong> Ingresa el teléfono del cliente antes de realizar las apuestas para poder enviarlas por WhatsApp o SMS.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección 2: Agenda de Clientes -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#agenda">
+                2. Agenda de Clientes
+            </button>
+        </h2>
+        <div id="agenda" class="accordion-collapse collapse" data-bs-parent="#manualAccordion">
+            <div class="accordion-body">
+                <h5>¿Qué es la Agenda de Clientes?</h5>
+                <p>La agenda te permite guardar la información de tus clientes para agilizar el proceso de apuestas y llevar un historial.</p>
+                
+                <h5>Agregar un Cliente</h5>
+                <ol>
+                    <li>Ve a "Agenda de Clientes"</li>
+                    <li>Haz clic en "+ Nuevo Cliente"</li>
+                    <li>Completa: nombre, teléfono, dirección y notas</li>
+                    <li>Guarda</li>
+                </ol>
+                
+                <h5>Autocompletado de Teléfono</h5>
+                <p>Al realizar apuestas, escribe el teléfono del cliente y el sistema sugerirá automáticamente los clientes que coincidan. Selecciona uno para ver su información.</p>
+                
+                <h5>Ver Historial de un Cliente</h5>
+                <p>Haz clic en "Historial" en la lista de clientes para ver todas las apuestas realizadas por ese cliente, estadísticas y números favoritos.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección 3: Consultar Premios -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#premios">
+                3. Consultar Mis Premios
+            </button>
+        </h2>
+        <div id="premios" class="accordion-collapse collapse" data-bs-parent="#manualAccordion">
+            <div class="accordion-body">
+                <h5>Consultar Premios Ganados</h5>
+                <ol>
+                    <li>Ve a "Consultar Mis Premios"</li>
+                    <li>Selecciona la fecha</li>
+                    <li>Selecciona la lotería</li>
+                    <li>Ingresa el número ganador</li>
+                    <li>Haz clic en "Consultar"</li>
+                </ol>
+                
+                <p>El sistema mostrará todas las apuestas ganadas con ese número y el monto a pagar.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección 4: Mi Información -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#informacion">
+                4. Mi Información
+            </button>
+        </h2>
+        <div id="informacion" class="accordion-collapse collapse" data-bs-parent="#manualAccordion">
+            <div class="accordion-body">
+                <h5>¿Qué muestra Mi Información?</h5>
+                <p>En esta sección puedes ver:</p>
+                <ul>
+                    <li><strong>Ventas de hoy:</strong> Total de dinero apostado hoy</li>
+                    <li><strong>Apuestas de hoy:</strong> Cantidad de apuestas realizadas hoy</li>
+                    <li><strong>Ganancia de hoy:</strong> Tu comisión por las ventas de hoy</li>
+                    <li><strong>Ganancia del mes:</strong> Tu comisión acumulada del mes</li>
+                    <li><strong>Últimas apuestas:</strong> Historial reciente de tus apuestas</li>
+                </ul>
+                
+                <div class="alert alert-info">
+                    <strong>Comisión:</strong> Tu ganancia se calcula como un porcentaje de las ventas totales. Este porcentaje lo define el empresario.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección 5: Estadísticas -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#estadisticas">
+                5. Estadísticas Personales
+            </button>
+        </h2>
+        <div id="estadisticas" class="accordion-collapse collapse" data-bs-parent="#manualAccordion">
+            <div class="accordion-body">
+                <h5>Análisis de tu Rendimiento</h5>
+                <p>En "Estadísticas" puedes ver análisis detallados de tu desempeño:</p>
+                
+                <h6>Filtros de Fecha</h6>
+                <p>Selecciona un rango de fechas para ver las estadísticas de ese período.</p>
+                
+                <h6>Métricas Disponibles</h6>
+                <ul>
+                    <li><strong>Números más jugados:</strong> Los números que tus clientes eligen con más frecuencia</li>
+                    <li><strong>Loterías favoritas:</strong> Las loterías con más apuestas</li>
+                    <li><strong>Ventas por día de la semana:</strong> Qué días vendes más</li>
+                    <li><strong>Ventas últimos 7 días:</strong> Tendencia de ventas reciente</li>
+                    <li><strong>Apuestas por cifras:</strong> Preferencia de tus clientes por cantidad de cifras</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección 6: Ganancias del Día -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ganancias">
+                6. Ganancias del Día
+            </button>
+        </h2>
+        <div id="ganancias" class="accordion-collapse collapse" data-bs-parent="#manualAccordion">
+            <div class="accordion-body">
+                <h5>Detalle de Ganancias Diarias</h5>
+                <p>Esta sección muestra un desglose detallado de tus ganancias por día:</p>
+                
+                <ul>
+                    <li><strong>Ventas por lotería:</strong> Cuánto vendiste en cada lotería</li>
+                    <li><strong>Ventas por hora:</strong> Distribución de ventas durante el día</li>
+                    <li><strong>Últimas apuestas:</strong> Detalle de las apuestas más recientes</li>
+                </ul>
+                
+                <p>Puedes seleccionar cualquier fecha para ver las ganancias de ese día específico.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección 7: Tickets y QR -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tickets">
+                7. Tickets y Códigos QR
+            </button>
+        </h2>
+        <div id="tickets" class="accordion-collapse collapse" data-bs-parent="#manualAccordion">
+            <div class="accordion-body">
+                <h5>Generar Ticket</h5>
+                <p>En "Mis Apuestas", cada apuesta tiene un botón "Ticket" que genera un PDF imprimible con todos los detalles de la apuesta.</p>
+                
+                <h5>Generar Código QR</h5>
+                <p>El botón "QR" genera un código QR que contiene toda la información de la apuesta. Puedes compartirlo con el cliente como comprobante.</p>
+                
+                <div class="alert alert-warning">
+                    <strong>Importante:</strong> El ticket y el QR son comprobantes de la apuesta. Guárdalos para reclamar premios.
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

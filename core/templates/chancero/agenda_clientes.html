@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% block title %}Agenda de Clientes{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Agenda de Clientes</h2>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Dashboard</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <h5 class="mb-2 mb-md-0">Mis Clientes</h5>
+                <button type="button" class="btn btn-primary w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#crearClienteModal">
+                    + Nuevo Cliente
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Teléfono</th>
+                                <th>Dirección</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cliente in clientes %}
+                            <tr>
+                                <td>{{ cliente.nombre }}</td>
+                                <td>{{ cliente.telefono }}</td>
+                                <td>{{ cliente.direccion|default:"-" }}</td>
+                                <td>
+                                    <a href="{% url 'historial_cliente' cliente.id %}" class="btn btn-sm btn-info">Historial</a>
+                                    <button type="button" class="btn btn-sm btn-warning" onclick="editarCliente({{ cliente.id }}, '{{ cliente.nombre|escapejs }}', '{{ cliente.telefono|escapejs }}', '{{ cliente.direccion|escapejs }}', '{{ cliente.notas|escapejs }}')">Editar</button>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="eliminarCliente({{ cliente.id }})">Eliminar</button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No hay clientes registrados</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Crear Cliente -->
+<div class="modal fade" id="crearClienteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nuevo Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="crearClienteForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Nombre:</label>
+                        <input type="text" name="nombre" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Teléfono:</label>
+                        <input type="tel" name="telefono" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Dirección:</label>
+                        <textarea name="direccion" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notas:</label>
+                        <textarea name="notas" class="form-control" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="crearCliente()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Cliente -->
+<div class="modal fade" id="editarClienteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editarClienteForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="cliente_id" id="edit_cliente_id">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre:</label>
+                        <input type="text" name="nombre" id="edit_nombre" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Teléfono:</label>
+                        <input type="tel" name="telefono" id="edit_telefono" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Dirección:</label>
+                        <textarea name="direccion" id="edit_direccion" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notas:</label>
+                        <textarea name="notas" id="edit_notas" class="form-control" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarEdicion()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function crearCliente() {
+    const form = document.getElementById('crearClienteForm');
+    const formData = new FormData(form);
+    
+    fetch('{% url "cliente_create" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.error || 'Error al crear cliente');
+        }
+    });
+}
+
+function editarCliente(id, nombre, telefono, direccion, notas) {
+    document.getElementById('edit_cliente_id').value = id;
+    document.getElementById('edit_nombre').value = nombre;
+    document.getElementById('edit_telefono').value = telefono;
+    document.getElementById('edit_direccion').value = direccion || '';
+    document.getElementById('edit_notas').value = notas || '';
+    
+    new bootstrap.Modal(document.getElementById('editarClienteModal')).show();
+}
+
+function guardarEdicion() {
+    const id = document.getElementById('edit_cliente_id').value;
+    const form = document.getElementById('editarClienteForm');
+    const formData = new FormData(form);
+    
+    fetch(`/chancero/clientes/${id}/editar/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.error || 'Error al editar cliente');
+        }
+    });
+}
+
+function eliminarCliente(id) {
+    if (confirm('¿Está seguro de eliminar este cliente?')) {
+        fetch(`/chancero/clientes/${id}/eliminar/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.error || 'Error al eliminar cliente');
+            }
+        });
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

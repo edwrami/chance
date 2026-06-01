@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Consultar Número{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Consultar Número</h2>
+    <div class="d-flex flex-column flex-md-row gap-2">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Dashboard</a>
+        <a href="{% url 'acumulados' %}" class="btn btn-primary w-100 w-md-auto">Ver Acumulados</a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Buscar Apuestas por Número</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-12 col-md-3">
+                        <label class="form-label">Número:</label>
+                        <input type="text" name="numero" class="form-control" value="{{ numero }}" placeholder="Ej: 1234">
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label">Lotería:</label>
+                        <select name="loteria" class="form-select">
+                            <option value="">Seleccione una lotería</option>
+                            {% for loteria in loterias %}
+                            <option value="{{ loteria.id }}" {% if loteria_id == loteria.id|stringformat:"s" %}selected{% endif %}>{{ loteria.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label">Fecha:</label>
+                        <input type="date" name="fecha" class="form-control" value="{{ fecha }}">
+                    </div>
+                    <div class="col-12 col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if apuestas %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Apuestas al número {{ numero }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-12 col-md-4">
+                        <div class="alert alert-info">
+                            <strong>Total Ventas:</strong> ${{ total_ventas|floatformat:0 }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="alert alert-warning">
+                            <strong>Total Premios Potenciales:</strong> ${{ total_premios|floatformat:0 }}
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Chancero</th>
+                                <th>Hora</th>
+                                <th>Número</th>
+                                <th>Cifras</th>
+                                <th>Monto Apostado</th>
+                                <th>Premio Potencial</th>
+                                <th>Premio a Pagar</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for apuesta in apuestas %}
+                            <tr>
+                                <td>{{ apuesta.chancero.nombres }} {{ apuesta.chancero.apellidos }}</td>
+                                <td>{{ apuesta.fecha_hora|date:"H:i" }}</td>
+                                <td>{{ apuesta.numero }}</td>
+                                <td>{{ apuesta.cifras }}</td>
+                                <td>${{ apuesta.monto_apostado|floatformat:0 }}</td>
+                                <td>${{ apuesta.premio_potencial|floatformat:0 }}</td>
+                                <td>
+                                    {% if apuesta.premio_ganado is None %}
+                                    <span class="text-muted">Pendiente resultado</span>
+                                    {% elif apuesta.premio_ganado == 0 %}
+                                    <span class="text-danger">No ganó</span>
+                                    {% else %}
+                                    <span class="text-success">${{ apuesta.premio_ganado|floatformat:0 }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if apuesta.estado == 'activa' %}
+                                    <span class="badge bg-success">Activa</span>
+                                    {% elif apuesta.estado == 'pagada' %}
+                                    <span class="badge bg-primary">Pagada</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">{{ apuesta.estado }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

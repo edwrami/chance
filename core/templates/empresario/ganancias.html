@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %}Ganancias por Fechas{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Ganancias por Fechas</h2>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Dashboard</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Filtrar por Fechas</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Fecha Inicio:</label>
+                        <input type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio }}">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Fecha Fin:</label>
+                        <input type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin }}">
+                    </div>
+                    <div class="col-12 col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Calcular</button>
+                    </div>
+                    <div class="col-12 col-md-2 d-flex align-items-end">
+                        {% if fecha_inicio and fecha_fin %}
+                        <a href="{% url 'exportar_datos_empresario' %}?fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}" class="btn btn-success w-100">Exportar Excel</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if fecha_inicio and fecha_fin %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Resumen General</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-3">
+                        <div class="alert alert-info">
+                            <strong>Total Ventas:</strong> ${{ total_ventas|floatformat:0 }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="alert alert-warning">
+                            <strong>Premios Pagados:</strong> ${{ total_premios_pagados|floatformat:0 }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="alert alert-secondary">
+                            <strong>Comisiones Pagadas:</strong> ${{ total_comisiones_pagadas|floatformat:0 }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="alert {% if ganancia_neta_empresario >= 0 %}alert-success{% else %}alert-danger{% endif %}">
+                            <strong>Ganancia Neta Empresario:</strong> ${{ ganancia_neta_empresario|floatformat:0 }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Ganancias por Lotería</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Lotería</th>
+                                <th>Ventas</th>
+                                <th>Premios Pagados</th>
+                                <th>Ganancia</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in ganancias_por_loteria %}
+                            <tr>
+                                <td>{{ item.loteria__nombre }}</td>
+                                <td>${{ item.ventas|floatformat:0 }}</td>
+                                <td>${{ item.premios_pagados|floatformat:0 }}</td>
+                                <td class="{% if item.ganancia >= 0 %}text-success{% else %}text-danger{% endif %}">${{ item.ganancia|floatformat:0 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Ganancias por Chancero</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Chancero</th>
+                                <th>Ventas</th>
+                                <th>Premios Pagados</th>
+                                <th>Comisión</th>
+                                <th>Ganancia Neta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in ganancias_por_chancero %}
+                            <tr>
+                                <td>{{ item.chancero__nombres }} {{ item.chancero__apellidos }}</td>
+                                <td>${{ item.ventas|floatformat:0 }}</td>
+                                <td>${{ item.premios_pagados|floatformat:0 }}</td>
+                                <td>${{ item.comision|floatformat:0 }} ({{ item.porcentaje_comision|floatformat:2 }}%)</td>
+                                <td class="{% if item.ganancia_neta >= 0 %}text-success{% else %}text-danger{% endif %}">${{ item.ganancia_neta|floatformat:0 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

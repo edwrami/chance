@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Configuración{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+    <h2>Configuración</h2>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Volver</a>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Autorización de Tipos de Apuestas</h5>
+            </div>
+            <div class="card-body">
+                {% if success %}
+                <div class="alert alert-success">{{ success }}</div>
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    <h6>2 Cifras</h6>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="autorizar_2c_directo" id="autorizar_2c_directo" {% if empresario.autorizar_2c_directo %}checked{% endif %}>
+                        <label class="form-check-label" for="autorizar_2c_directo">Autorizar 2 Cifras Directo (Pleno)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="autorizar_2c_combinado" id="autorizar_2c_combinado" {% if empresario.autorizar_2c_combinado %}checked{% endif %}>
+                        <label class="form-check-label" for="autorizar_2c_combinado">Autorizar 2 Cifras Combinado</label>
+                    </div>
+                    
+                    <h6 class="mt-3">3 Cifras</h6>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="autorizar_3c_directo" id="autorizar_3c_directo" {% if empresario.autorizar_3c_directo %}checked{% endif %}>
+                        <label class="form-check-label" for="autorizar_3c_directo">Autorizar 3 Cifras Directo</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="autorizar_3c_combinado" id="autorizar_3c_combinado" {% if empresario.autorizar_3c_combinado %}checked{% endif %}>
+                        <label class="form-check-label" for="autorizar_3c_combinado">Autorizar 3 Cifras Combinado</label>
+                    </div>
+                    
+                    <h6 class="mt-3">4 Cifras</h6>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="autorizar_4c_directo" id="autorizar_4c_directo" {% if empresario.autorizar_4c_directo %}checked{% endif %}>
+                        <label class="form-check-label" for="autorizar_4c_directo">Autorizar 4 Cifras Directo</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="autorizar_4c_combinado" id="autorizar_4c_combinado" {% if empresario.autorizar_4c_combinado %}checked{% endif %}>
+                        <label class="form-check-label" for="autorizar_4c_combinado">Autorizar 4 Cifras Combinado</label>
+                    </div>
+                    
+                    <h6 class="mt-3">5 Cifras</h6>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="autorizar_5c_directo" id="autorizar_5c_directo" {% if empresario.autorizar_5c_directo %}checked{% endif %}>
+                        <label class="form-check-label" for="autorizar_5c_directo">Autorizar 5 Cifras Directo</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="autorizar_5c_combinado" id="autorizar_5c_combinado" {% if empresario.autorizar_5c_combinado %}checked{% endif %}>
+                        <label class="form-check-label" for="autorizar_5c_combinado">Autorizar 5 Cifras Combinado</label>
+                    </div>
+                    
+                    <h6 class="mt-3">6 Cifras</h6>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="autorizar_6c_directo" id="autorizar_6c_directo" {% if empresario.autorizar_6c_directo %}checked{% endif %}>
+                        <label class="form-check-label" for="autorizar_6c_directo">Autorizar 6 Cifras Directo</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="autorizar_6c_combinado" id="autorizar_6c_combinado" {% if empresario.autorizar_6c_combinado %}checked{% endif %}>
+                        <label class="form-check-label" for="autorizar_6c_combinado">Autorizar 6 Cifras Combinado</label>
+                    </div>
+                    
+                    <hr>
+                    <div class="form-group mt-3">
+                        <label>Límite de Chanceros:</label>
+                        <input type="number" class="form-control" value="{{ empresario.limite_chanceros }}" disabled>
+                        <small class="text-muted">Configurado por el administrador</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary mt-4">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

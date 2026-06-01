@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Limpiar Datos Antiguos{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Limpiar Datos Antiguos</h2>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Dashboard</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Configuración Actual</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Días de retención:</strong> {{ dias_retencion }}</p>
+                <p><strong>Fecha límite:</strong> {{ fecha_limite }}</p>
+                <p class="text-muted">Se eliminarán todos los datos anteriores a esta fecha.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Registros a Eliminar</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <div class="alert alert-info">
+                            <strong>Apuestas:</strong> {{ total_apuestas }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="alert alert-warning">
+                            <strong>Acumulados:</strong> {{ total_acumulados }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="alert alert-secondary">
+                            <strong>Liquidaciones:</strong> {{ total_liquidaciones }}
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-danger mt-3">
+                    <strong>Total registros a eliminar:</strong> {{ total_registros }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Confirmación</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <strong>⚠️ ADVERTENCIA:</strong> Esta acción eliminará permanentemente {{ total_registros }} registros. Esta acción no se puede deshacer.
+                </div>
+                <p class="text-muted">Se recomienda exportar un backup en Excel antes de proceder con la limpieza.</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
