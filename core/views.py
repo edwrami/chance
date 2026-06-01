@@ -15,6 +15,11 @@ import json
 from .models import *
 from .permissions import *
 
+
+def health_check(request):
+    return JsonResponse({'status': 'ok'})
+
+
 # ========== VISTAS DE AUTENTICACIÓN ==========
 
 class LoginView(View):
