@@ -23,6 +23,7 @@ RAILWAY_PUBLIC_DOMAIN = os.getenv('RAILWAY_PUBLIC_DOMAIN')
 if RAILWAY_PUBLIC_DOMAIN:
     ALLOWED_HOSTS.append(RAILWAY_PUBLIC_DOMAIN)
 ALLOWED_HOSTS.append('.up.railway.app')
+ALLOWED_HOSTS.append('.railway.app')
 
 # =============================================================================
 # APLICACIONES INSTALADAS
@@ -170,6 +171,7 @@ CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv('CSRF_TRUSTED_ORI
 if RAILWAY_PUBLIC_DOMAIN:
     CSRF_TRUSTED_ORIGINS.append(f'https://{RAILWAY_PUBLIC_DOMAIN}')
 CSRF_TRUSTED_ORIGINS.append('https://*.up.railway.app')
+CSRF_TRUSTED_ORIGINS.append('https://*.railway.app')
 
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
