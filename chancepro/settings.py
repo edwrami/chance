@@ -18,12 +18,16 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-chancepro-2024-seguro')
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if host.strip()]
 RAILWAY_PUBLIC_DOMAIN = os.getenv('RAILWAY_PUBLIC_DOMAIN')
+IS_RAILWAY = bool(os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_PROJECT_ID') or RAILWAY_PUBLIC_DOMAIN)
+default_allowed_hosts = 'localhost,127.0.0.1'
+if IS_RAILWAY:
+    default_allowed_hosts = '.up.railway.app,.railway.app'
+ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', default_allowed_hosts).split(',') if host.strip()]
 if RAILWAY_PUBLIC_DOMAIN:
     ALLOWED_HOSTS.append(RAILWAY_PUBLIC_DOMAIN)
-ALLOWED_HOSTS.append('.up.railway.app')
-ALLOWED_HOSTS.append('.railway.app')
+if IS_RAILWAY:
+    ALLOWED_HOSTS.extend(['.up.railway.app', '.railway.app'])
 
 # =============================================================================
 # APLICACIONES INSTALADAS
@@ -170,8 +174,8 @@ CORS_ALLOWED_ORIGINS = [origin.strip() for origin in os.getenv('CORS_ALLOWED_ORI
 CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if origin.strip()]
 if RAILWAY_PUBLIC_DOMAIN:
     CSRF_TRUSTED_ORIGINS.append(f'https://{RAILWAY_PUBLIC_DOMAIN}')
-CSRF_TRUSTED_ORIGINS.append('https://*.up.railway.app')
-CSRF_TRUSTED_ORIGINS.append('https://*.railway.app')
+if IS_RAILWAY:
+    CSRF_TRUSTED_ORIGINS.extend(['https://*.up.railway.app', 'https://*.railway.app'])
 
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
