@@ -2168,11 +2168,14 @@ class ApuestaCreateView(View):
             activa=True
         )
 
+        # Depuración: mostrar todas las loterías activas temporalmente
+        loterias_filtradas = list(loterias)
+
         # Filtrar por día habilitado (manejo de JSONField)
-        loterias_filtradas = []
-        for loteria in loterias:
-            if isinstance(loteria.dias_habilitados, list) and dia_hoy in loteria.dias_habilitados:
-                loterias_filtradas.append(loteria)
+        # loterias_filtradas = []
+        # for loteria in loterias:
+        #     if isinstance(loteria.dias_habilitados, list) and dia_hoy in loteria.dias_habilitados:
+        #         loterias_filtradas.append(loteria)
 
         context = {
             'loterias': loterias_filtradas,
