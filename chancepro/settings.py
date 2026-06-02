@@ -83,15 +83,6 @@ TEMPLATES = [
             ],
             'debug': DEBUG,
             'string_if_invalid': '',
-            'loaders': [
-                ('django.template.loaders.cached.Loader', [
-                    'django.template.loaders.filesystem.Loader',
-                    'django.template.loaders.app_directories.Loader',
-                ]),
-            ] if not DEBUG else [
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
-            ],
         },
     },
 ]

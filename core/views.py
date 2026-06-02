@@ -2149,7 +2149,9 @@ class LiquidacionPagarView(View):
         except:
             pass
 
-        return JsonResponse({'success': True})
+        from django.contrib import messages
+        messages.success(request, f'Liquidación marcada como pagada. Comisión: ${liquidacion.comision_valor:,.0f}')
+        return redirect('liquidaciones_list')
 
 
 # ========== VISTAS PARA CHANCERO ==========
