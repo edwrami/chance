@@ -2629,7 +2629,7 @@ class LiquidacionSolicitarView(View):
     def post(self, request):
         if request.user.rol != 'empresario':
             return redirect('dashboard')
-        
+
         chancero_id = request.POST.get('chancero_id')
         fecha_inicio = request.POST.get('fecha_inicio')
         fecha_fin = request.POST.get('fecha_fin')
@@ -2637,9 +2637,9 @@ class LiquidacionSolicitarView(View):
 
         try:
             comision = ComisionVendedor.objects.get(empresario=request.user, chancero=chancero)
-            porcentaje = comision.porcentaje
+            porcentaje = float(comision.porcentaje)
         except ComisionVendedor.DoesNotExist:
-            porcentaje = 0
+            porcentaje = 0.0
 
         ventas = Apuesta.objects.filter(
             empresario=request.user,
@@ -2649,17 +2649,18 @@ class LiquidacionSolicitarView(View):
             liquidacion_pagada=False
         ).aggregate(total=Sum('monto_apostado'))['total'] or 0
 
-        comision_valor = ventas * (porcentaje / 100) if porcentaje else 0
-        valor_empresario = ventas - comision_valor
+        comision_valor = float(ventas) * (porcentaje / 100) if porcentaje > 0 else 0
+        valor_empresario = float(ventas) - comision_valor
 
+        from decimal import Decimal
         liquidacion = Liquidacion.objects.create(
             empresario=request.user,
             chancero=chancero,
             fecha_inicio=fecha_inicio,
             fecha_fin=fecha_fin,
-            total_ventas=ventas,
-            comision_porcentaje=porcentaje,
-            comision_valor=comision_valor,
+            total_ventas=Decimal(str(ventas)),
+            comision_porcentaje=Decimal(str(porcentaje)),
+            comision_valor=Decimal(str(comision_valor)),
             estado='solicitada',
         )
 
