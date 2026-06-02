@@ -1350,7 +1350,7 @@ class LiquidacionesChanceroView(View):
                 chancero_id=chancero_id,
                 fecha_inicio__gte=fecha_inicio,
                 fecha_fin__lte=fecha_fin
-            ).select_related('chancero').order_by('-fecha_inicio')
+            ).select_related('chancero').order_by('-fecha_solicitud')
 
             from decimal import Decimal
             total_liquidado = liquidaciones.aggregate(total=Sum('comision_valor'))['total'] or Decimal('0')
