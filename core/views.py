@@ -2148,11 +2148,11 @@ class ApuestaCreateView(View):
     def get(self, request):
         if request.user.rol != 'chancero':
             return redirect('dashboard')
-        
+
         # Verificar si el chancero está activo
         if not request.user.activo:
             return render(request, 'chancero/inactivo.html')
-        
+
         # Loterías disponibles hoy
         hoy = timezone.now().strftime('%A')
         dias_map = {
@@ -2161,15 +2161,21 @@ class ApuestaCreateView(View):
             'Sunday': 'Domingo'
         }
         dia_hoy = dias_map[hoy]
-        
+
+        # Filtrar loterías activas del empresario
         loterias = Loteria.objects.filter(
             empresario=request.user.empresario,
-            activa=True,
-            dias_habilitados__contains=[dia_hoy]
+            activa=True
         )
-        
+
+        # Filtrar por día habilitado (manejo de JSONField)
+        loterias_filtradas = []
+        for loteria in loterias:
+            if isinstance(loteria.dias_habilitados, list) and dia_hoy in loteria.dias_habilitados:
+                loterias_filtradas.append(loteria)
+
         context = {
-            'loterias': loterias,
+            'loterias': loterias_filtradas,
         }
         return render(request, 'chancero/apuesta_form.html', context)
     
