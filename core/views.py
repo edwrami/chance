@@ -3068,20 +3068,21 @@ class InformacionChanceroView(View):
     def get(self, request):
         if request.user.rol != 'chancero':
             return redirect('dashboard')
-        
-        hoy = timezone.now().date()
-        
+
+        ahora_local = timezone.localtime(timezone.now())
+        hoy = ahora_local.date()
+
         # Ventas de hoy
         ventas_hoy = Apuesta.objects.filter(
             chancero=request.user,
             fecha_hora__date=hoy
         ).aggregate(total=Sum('monto_apostado'))['total'] or 0
-        
+
         apuestas_hoy = Apuesta.objects.filter(
             chancero=request.user,
             fecha_hora__date=hoy
         ).count()
-        
+
         # Obtener comisión
         try:
             comision = ComisionVendedor.objects.get(chancero=request.user)
@@ -3090,14 +3091,14 @@ class InformacionChanceroView(View):
         except ComisionVendedor.DoesNotExist:
             porcentaje_comision = 0
             ganancia_hoy = 0
-        
+
         # Ventas del mes
         ventas_mes = Apuesta.objects.filter(
             chancero=request.user,
             fecha_hora__month=hoy.month,
             fecha_hora__year=hoy.year
         ).aggregate(total=Sum('monto_apostado'))['total'] or 0
-        
+
         ganancia_mes = ventas_mes * (porcentaje_comision / 100)
         
         # Últimas apuestas
