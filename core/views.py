@@ -214,38 +214,49 @@ class DashboardView(View):
                 chancero=user,
                 fecha_hora__date=timezone.now().date()
             ).aggregate(total=Sum('monto_apostado'))['total'] or 0
-            
+
             apuestas_hoy = Apuesta.objects.filter(
                 chancero=user,
                 fecha_hora__date=timezone.now().date()
             ).count()
-            
+
             try:
                 comision = ComisionVendedor.objects.get(chancero=user)
                 porcentaje = comision.porcentaje
             except:
                 porcentaje = 0
-            
+
             # Últimas 10 apuestas
             ultimas_apuestas = Apuesta.objects.filter(
                 chancero=user
             ).order_by('-fecha_hora')[:10]
-            
-            # Loterías disponibles hoy
-            hoy = timezone.now().strftime('%A')
+
+            # Loterías disponibles hoy (usar mismo filtrado que ApuestaCreateView)
+            ahora_dt = timezone.localtime(timezone.now())
+            hoy = ahora_dt.strftime('%A')
             dias_map = {
                 'Monday': 'Lunes', 'Tuesday': 'Martes', 'Wednesday': 'Miércoles',
                 'Thursday': 'Jueves', 'Friday': 'Viernes', 'Saturday': 'Sábado',
                 'Sunday': 'Domingo'
             }
             dia_hoy = dias_map[hoy]
-            
-            loterias_disponibles = Loteria.objects.filter(
+
+            loterias = Loteria.objects.filter(
                 empresario=user.empresario,
-                activa=True,
-                dias_habilitados__contains=[dia_hoy]
+                activa=True
             )
-            
+
+            loterias_disponibles = []
+            hora_actual = ahora_dt.time()
+            for loteria in loterias:
+                dias = loteria.dias_habilitados or []
+                if isinstance(dias, str):
+                    dias = [dias]
+                dia_habilitado = dia_hoy in dias
+                horario_valido = loteria.hora_apertura <= hora_actual <= loteria.hora_cierre
+                if dia_habilitado and horario_valido:
+                    loterias_disponibles.append(loteria)
+
             context = {
                 'ventas_hoy': ventas_hoy,
                 'apuestas_hoy': apuestas_hoy,
