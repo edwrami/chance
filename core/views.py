@@ -1323,16 +1323,16 @@ class LiquidacionesChanceroView(View):
     def get(self, request):
         if request.user.rol != 'empresario':
             return redirect('dashboard')
-        
+
         chancero_id = request.GET.get('chancero')
         fecha_inicio = request.GET.get('fecha_inicio')
         fecha_fin = request.GET.get('fecha_fin')
-        
+
         chanceros = Usuario.objects.filter(rol='chancero', empresario=request.user)
-        
+
         liquidaciones = []
-        total_liquidado = 0
-        
+        total_liquidado = Decimal('0')
+
         if chancero_id and fecha_inicio and fecha_fin:
             liquidaciones = Liquidacion.objects.filter(
                 empresario=request.user,
@@ -1340,9 +1340,10 @@ class LiquidacionesChanceroView(View):
                 fecha_inicio__gte=fecha_inicio,
                 fecha_fin__lte=fecha_fin
             ).select_related('chancero').order_by('-fecha_inicio')
-            
-            total_liquidado = liquidaciones.aggregate(total=Sum('comision_valor'))['total'] or 0
-        
+
+            from decimal import Decimal
+            total_liquidado = liquidaciones.aggregate(total=Sum('comision_valor'))['total'] or Decimal('0')
+
         context = {
             'chanceros': chanceros,
             'chancero_id': chancero_id,
@@ -2029,8 +2030,9 @@ class LiquidacionesListView(View):
         ).select_related('chancero').order_by('-fecha_solicitud')
 
         # Calcular totales
-        total_ventas = liquidaciones.aggregate(total=Sum('total_ventas'))['total'] or 0
-        total_comisiones = liquidaciones.aggregate(total=Sum('comision_valor'))['total'] or 0
+        from decimal import Decimal
+        total_ventas = liquidaciones.aggregate(total=Sum('total_ventas'))['total'] or Decimal('0')
+        total_comisiones = liquidaciones.aggregate(total=Sum('comision_valor'))['total'] or Decimal('0')
         total_retenido = total_ventas - total_comisiones
 
         context = {
@@ -2098,12 +2100,12 @@ class LiquidacionPagarView(View):
     def post(self, request, pk):
         if request.user.rol != 'empresario':
             return JsonResponse({'error': 'No autorizado'}, status=403)
-        
+
         liquidacion = get_object_or_404(Liquidacion, pk=pk, empresario=request.user)
         liquidacion.estado = 'pagada'
         liquidacion.fecha_pago = timezone.now()
         liquidacion.save()
-        
+
         # Marcar las apuestas del período como liquidadas y pagadas
         # Esto autoriza el pago de premios para esas apuestas
         apuestas_periodo = Apuesta.objects.filter(
@@ -2117,24 +2119,25 @@ class LiquidacionPagarView(View):
             liquidacion=liquidacion,
             liquidacion_pagada=True
         )
-        
+
         # Generar factura de comisión global para el admin
         try:
+            from decimal import Decimal
             comision_global = ComisionGlobal.objects.get(empresario=request.user, activo=True)
-            valor_comision_admin = liquidacion.comision_valor * (comision_global.porcentaje / 100)
-            
+            valor_comision_admin = float(liquidacion.comision_valor) * (float(comision_global.porcentaje) / 100)
+
             FacturaComision.objects.create(
                 empresario=request.user,
                 fecha_inicio=liquidacion.fecha_inicio,
                 fecha_fin=liquidacion.fecha_fin,
                 total_ventas=liquidacion.total_ventas,
                 porcentaje_comision=comision_global.porcentaje,
-                valor_comision=valor_comision_admin,
+                valor_comision=Decimal(str(valor_comision_admin)),
                 estado='pendiente'
             )
         except:
             pass
-        
+
         return JsonResponse({'success': True})
 
 
@@ -2548,8 +2551,9 @@ class MiLiquidacionView(View):
         ).order_by('-fecha_solicitud')
 
         # Calcular totales del chancero
-        total_ventas = liquidaciones.aggregate(total=Sum('total_ventas'))['total'] or 0
-        total_comisiones = liquidaciones.aggregate(total=Sum('comision_valor'))['total'] or 0
+        from decimal import Decimal
+        total_ventas = liquidaciones.aggregate(total=Sum('total_ventas'))['total'] or Decimal('0')
+        total_comisiones = liquidaciones.aggregate(total=Sum('comision_valor'))['total'] or Decimal('0')
 
         context = {
             'liquidaciones': liquidaciones,
