@@ -105,20 +105,21 @@ class DashboardView(View):
         
         elif user.rol == 'empresario':
             # Datos para empresario
-            hoy = timezone.now().date()
+            ahora_local = timezone.localtime(timezone.now())
+            hoy = ahora_local.date()
             
             # Chanceros
             total_chanceros = Usuario.objects.filter(
-                rol='chancero', 
+                rol='chancero',
                 empresario=user
             ).count()
             chanceros_activos = Usuario.objects.filter(
-                rol='chancero', 
+                rol='chancero',
                 empresario=user,
                 activo=True
             ).count()
             
-            # Ventas de hoy
+            # Ventas de hoy (usando fecha local)
             apuestas_hoy = Apuesta.objects.filter(
                 empresario=user,
                 fecha_hora__date=hoy
@@ -131,8 +132,13 @@ class DashboardView(View):
                 total=Sum('premio_potencial')
             )['total'] or 0
             
-            # Caja estimada (ventas - premios pagados)
-            caja_hoy = ventas_hoy - premios_pagados_hoy
+            # Caja estimada (ventas - premios pagados - comisiones pagadas)
+            comisiones_pagadas_hoy = Liquidacion.objects.filter(
+                empresario=user,
+                fecha_pago__date=hoy,
+                estado='pagada'
+            ).aggregate(total=Sum('comision_valor'))['total'] or 0
+            caja_hoy = ventas_hoy - premios_pagados_hoy - comisiones_pagadas_hoy
             
             # Liquidaciones pendientes
             liquidaciones_pendientes = Liquidacion.objects.filter(
@@ -158,6 +164,16 @@ class DashboardView(View):
                     filter=Q(apuestas_chancero__fecha_hora__date=hoy)
                 )
             ).order_by('-ventas_hoy')
+
+            # Detalle de apuestas por chancero para mostrar números, loterías y horas
+            apuestas_detalle_por_chancero = {}
+            for chancero in chanceros_data:
+                apuestas_chancero = Apuesta.objects.filter(
+                    empresario=user,
+                    chancero=chancero,
+                    fecha_hora__date=hoy
+                ).select_related('loteria').order_by('-fecha_hora')
+                apuestas_detalle_por_chancero[chancero.id] = apuestas_chancero
             
             # Top 5 chanceros del día
             top_chanceros = chanceros_data[:5]
@@ -202,6 +218,7 @@ class DashboardView(View):
                 'valor_liquidaciones_pendientes': valor_liquidaciones_pendientes,
                 'top_chanceros': top_chanceros,
                 'chanceros_data': chanceros_data,
+                'apuestas_detalle_por_chancero': apuestas_detalle_por_chancero,
                 'loterias_activas': loterias_activas,
                 'loterias_hoy': loterias_hoy,
                 'ventas_por_loteria': ventas_por_loteria,
@@ -210,14 +227,17 @@ class DashboardView(View):
         
         elif user.rol == 'chancero':
             # Datos para chancero
+            ahora_local = timezone.localtime(timezone.now())
+            hoy = ahora_local.date()
+
             ventas_hoy = Apuesta.objects.filter(
                 chancero=user,
-                fecha_hora__date=timezone.now().date()
+                fecha_hora__date=hoy
             ).aggregate(total=Sum('monto_apostado'))['total'] or 0
 
             apuestas_hoy = Apuesta.objects.filter(
                 chancero=user,
-                fecha_hora__date=timezone.now().date()
+                fecha_hora__date=hoy
             ).count()
 
             try:
