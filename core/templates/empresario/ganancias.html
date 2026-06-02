@@ -137,5 +137,47 @@
         </div>
     </div>
 </div>
+
+{% if pagos_premios %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Detalle de Premios Pagados</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Fecha Pago</th>
+                                <th>Chancero</th>
+                                <th>Lotería</th>
+                                <th>Número</th>
+                                <th>Monto Pagado</th>
+                                <th>Pagado Por</th>
+                                <th>Observaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pago in pagos_premios %}
+                            <tr>
+                                <td>{{ pago.fecha_pago|date:"Y-m-d H:i" }}</td>
+                                <td>{{ pago.apuesta.chancero.nombres }} {{ pago.apuesta.chancero.apellidos }}</td>
+                                <td>{{ pago.apuesta.loteria.nombre }}</td>
+                                <td>{{ pago.apuesta.numero }}</td>
+                                <td class="text-danger">${{ pago.monto_pagado|floatformat:0 }}</td>
+                                <td>{{ pago.pagado_por.nombres }} {{ pago.pagado_por.apellidos }}</td>
+                                <td>{{ pago.observaciones|default:"-" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endif %}
 {% endblock %}

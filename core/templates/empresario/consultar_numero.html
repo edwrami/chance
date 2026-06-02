@@ -104,6 +104,17 @@
                                     <span class="badge bg-danger">{{ apuesta.estado }}</span>
                                     {% endif %}
                                 </td>
+                                <td>
+                                    {% if apuesta.estado == 'activa' and apuesta.premio_ganado > 0 %}
+                                    <button onclick="pagarPremio({{ apuesta.id }})" class="btn btn-sm btn-success">Pagar Premio</button>
+                                    {% elif apuesta.estado == 'pagada' %}
+                                    <span class="text-success">Pagado</span>
+                                    {% elif apuesta.premio_ganado == 0 %}
+                                    <span class="text-muted">No ganó</span>
+                                    {% else %}
+                                    <span class="text-muted">Pendiente</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -114,4 +125,49 @@
     </div>
 </div>
 {% endif %}
+
+<script>
+function pagarPremio(apuestaId) {
+    if (!confirm('¿Está seguro de pagar este premio?')) {
+        return;
+    }
+
+    fetch(`/empresario/apuestas/${apuestaId}/pagar-premio/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Premio pagado exitosamente: $' + data.monto_pagado);
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Error al procesar el pago');
+        console.error(error);
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
 {% endblock %}

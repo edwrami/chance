@@ -53,6 +53,7 @@ urlpatterns = [
     path('empresario/ventas/exportar/', views.ExportarVentasExcelView.as_view(), name='exportar_ventas'),
     path('empresario/acumulados/exportar/', views.ExportarAcumuladosExcelView.as_view(), name='exportar_acumulados'),
     path('empresario/consultar-numero/', views.ConsultarNumeroView.as_view(), name='consultar_numero'),
+    path('empresario/apuestas/<int:pk>/pagar-premio/', views.PagarPremioView.as_view(), name='pagar_premio'),
     path('empresario/acumulados/', views.AcumuladosView.as_view(), name='acumulados'),
     path('empresario/reportes-chancero/', views.ReportesChanceroView.as_view(), name='reportes_chancero'),
     path('empresario/ganancias/', views.GananciasView.as_view(), name='ganancias'),

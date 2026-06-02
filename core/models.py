@@ -353,6 +353,32 @@ class Mensaje(models.Model):
         return f"{self.tipo} a {self.telefono_destino}"
 
 
+class PagoPremio(models.Model):
+    """Registro de cada pago de premio realizado"""
+    apuesta = models.ForeignKey(
+        Apuesta,
+        on_delete=models.CASCADE,
+        related_name='pagos_premio'
+    )
+    monto_pagado = models.DecimalField(max_digits=12, decimal_places=2)
+    fecha_pago = models.DateTimeField(auto_now_add=True)
+    pagado_por = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        limit_choices_to={'rol__in': ['empresario', 'admin_general']},
+        related_name='pagos_realizados'
+    )
+    observaciones = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Pago de Premio'
+        verbose_name_plural = 'Pagos de Premios'
+        ordering = ['-fecha_pago']
+
+    def __str__(self):
+        return f"Pago ${self.monto_pagado} - {self.apuesta.numero} ({self.apuesta.chancero.nombres})"
+
+
 class ComisionGlobal(models.Model):
     """Comisión que el admin general cobra a cada empresario"""
     empresario = models.ForeignKey(

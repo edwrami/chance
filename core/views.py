@@ -1290,6 +1290,13 @@ class GananciasView(View):
                     item['ganancia_neta'] = item['ventas'] - item['premios_pagados']
                     item['porcentaje_comision'] = 0
             
+            # Detalle de premios pagados en el período
+            pagos_premios = PagoPremio.objects.filter(
+                apuesta__empresario=request.user,
+                fecha_pago__date__gte=fecha_inicio,
+                fecha_pago__date__lte=fecha_fin
+            ).select_related('apuesta', 'apuesta__chancero', 'apuesta__loteria', 'pagado_por').order_by('-fecha_pago')
+            
             context = {
                 'fecha_inicio': fecha_inicio,
                 'fecha_fin': fecha_fin,
@@ -1300,6 +1307,7 @@ class GananciasView(View):
                 'ganancia_neta_empresario': ganancia_neta_empresario,
                 'ganancias_por_loteria': ganancias_por_loteria,
                 'ganancias_por_chancero': ganancias_por_chancero,
+                'pagos_premios': pagos_premios,
             }
         else:
             context = {
@@ -1754,6 +1762,41 @@ class ConsultarNumeroView(View):
             'total_premios': total_premios,
         }
         return render(request, 'empresario/consultar_numero.html', context)
+
+
+@method_decorator(login_required, name='dispatch')
+class PagarPremioView(View):
+    def post(self, request, apuesta_id):
+        if request.user.rol != 'empresario':
+            return JsonResponse({'error': 'No autorizado'}, status=403)
+        
+        apuesta = get_object_or_404(Apuesta, pk=apuesta_id, empresario=request.user)
+        
+        if apuesta.estado == 'pagada':
+            return JsonResponse({'error': 'Esta apuesta ya fue pagada'}, status=400)
+        
+        # Verificar si la liquidación está pagada (autoriza pago de premios)
+        if not apuesta.liquidacion_pagada:
+            return JsonResponse({'error': 'La liquidación de esta apuesta no ha sido pagada. Pague la liquidación primero.'}, status=400)
+        
+        # Crear registro de pago
+        pago = PagoPremio.objects.create(
+            apuesta=apuesta,
+            monto_pagado=apuesta.premio_potencial,
+            pagado_por=request.user,
+            observaciones=f"Pago de premio para número {apuesta.numero} en lotería {apuesta.loteria.nombre}"
+        )
+        
+        # Actualizar estado de la apuesta
+        apuesta.estado = 'pagada'
+        apuesta.save()
+        
+        return JsonResponse({
+            'success': True,
+            'pago_id': pago.id,
+            'monto_pagado': float(pago.monto_pagado),
+            'fecha_pago': pago.fecha_pago.strftime('%Y-%m-%d %H:%M')
+        })
 
 
 @method_decorator(login_required, name='dispatch')
@@ -2537,27 +2580,45 @@ class LiquidacionSolicitarView(View):
             return redirect('dashboard')
         
         hoy = timezone.now().date()
-        
-        # Calcular ventas del mes actual
-        ventas_mes = Apuesta.objects.filter(
-            empresario=request.user,
-            fecha_hora__month=hoy.month,
-            fecha_hora__year=hoy.year
-        ).aggregate(total=Sum('monto_apostado'))['total'] or 0
-        
-        # Calcular comisión
-        comision_global = ComisionGlobal.objects.filter(
-            empresario=request.user,
-            activo=True
-        ).first()
-        
-        porcentaje = comision_global.porcentaje if comision_global else 0
-        comision_valor = ventas_mes * (porcentaje / 100) if porcentaje else 0
+        fecha_inicio = request.GET.get('fecha_inicio', hoy.strftime('%Y-%m-%d'))
+        fecha_fin = request.GET.get('fecha_fin', hoy.strftime('%Y-%m-%d'))
+        chanceros = Usuario.objects.filter(rol='chancero', empresario=request.user).order_by('nombres', 'apellidos')
+        chanceros_data = []
+
+        for chancero in chanceros:
+            ventas = Apuesta.objects.filter(
+                empresario=request.user,
+                chancero=chancero,
+                fecha_hora__date__gte=fecha_inicio,
+                fecha_hora__date__lte=fecha_fin,
+                liquidacion_pagada=False
+            ).aggregate(total=Sum('monto_apostado'))['total'] or 0
+            apuestas_count = Apuesta.objects.filter(
+                empresario=request.user,
+                chancero=chancero,
+                fecha_hora__date__gte=fecha_inicio,
+                fecha_hora__date__lte=fecha_fin,
+                liquidacion_pagada=False
+            ).count()
+
+            try:
+                comision = ComisionVendedor.objects.get(empresario=request.user, chancero=chancero)
+                porcentaje = comision.porcentaje
+            except ComisionVendedor.DoesNotExist:
+                porcentaje = 0
+
+            chanceros_data.append({
+                'chancero': chancero,
+                'ventas': ventas,
+                'apuestas_count': apuestas_count,
+                'porcentaje': porcentaje,
+                'comision_valor': ventas * (porcentaje / 100) if porcentaje else 0,
+            })
         
         context = {
-            'ventas_mes': ventas_mes,
-            'porcentaje': porcentaje,
-            'comision_valor': comision_valor,
+            'fecha_inicio': fecha_inicio,
+            'fecha_fin': fecha_fin,
+            'chanceros_data': chanceros_data,
         }
         return render(request, 'empresario/liquidacion_solicitar.html', context)
     
@@ -2565,33 +2626,45 @@ class LiquidacionSolicitarView(View):
         if request.user.rol != 'empresario':
             return redirect('dashboard')
         
-        hoy = timezone.now().date()
-        
-        # Calcular ventas del mes actual
-        ventas_mes = Apuesta.objects.filter(
+        chancero_id = request.POST.get('chancero_id')
+        fecha_inicio = request.POST.get('fecha_inicio')
+        fecha_fin = request.POST.get('fecha_fin')
+        chancero = get_object_or_404(Usuario, pk=chancero_id, empresario=request.user, rol='chancero')
+
+        try:
+            comision = ComisionVendedor.objects.get(empresario=request.user, chancero=chancero)
+            porcentaje = comision.porcentaje
+        except ComisionVendedor.DoesNotExist:
+            porcentaje = 0
+
+        ventas = Apuesta.objects.filter(
             empresario=request.user,
-            fecha_hora__month=hoy.month,
-            fecha_hora__year=hoy.year
+            chancero=chancero,
+            fecha_hora__date__gte=fecha_inicio,
+            fecha_hora__date__lte=fecha_fin,
+            liquidacion_pagada=False
         ).aggregate(total=Sum('monto_apostado'))['total'] or 0
-        
-        # Calcular comisión
-        comision_global = ComisionGlobal.objects.filter(
-            empresario=request.user,
-            activo=True
-        ).first()
-        
-        porcentaje = comision_global.porcentaje if comision_global else 0
-        comision_valor = ventas_mes * (porcentaje / 100) if porcentaje else 0
-        
-        # Crear liquidación
+
+        comision_valor = ventas * (porcentaje / 100) if porcentaje else 0
+
         liquidacion = Liquidacion.objects.create(
             empresario=request.user,
-            fecha_solicitud=hoy,
-            estado='solicitada',
-            comision_valor=comision_valor,
+            chancero=chancero,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+            total_ventas=ventas,
             comision_porcentaje=porcentaje,
-            ventas_mes=ventas_mes
+            comision_valor=comision_valor,
+            estado='solicitada',
         )
+
+        Apuesta.objects.filter(
+            empresario=request.user,
+            chancero=chancero,
+            fecha_hora__date__gte=fecha_inicio,
+            fecha_hora__date__lte=fecha_fin,
+            liquidacion_pagada=False
+        ).update(liquidacion=liquidacion)
         
         return redirect('liquidaciones_list')
 
