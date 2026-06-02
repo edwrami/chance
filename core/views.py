@@ -2242,13 +2242,9 @@ class ApuestaCreateView(View):
                 empresario=request.user.empresario,
                 loteria=loteria
             )
-            # Calcular el acumulado actual de TODAS las apuestas de HOY a esta lotería
-            acumulado = Apuesta.objects.filter(
-                empresario=request.user.empresario,
-                loteria=loteria,
-                fecha_hora__date=timezone.now().date()
-            ).aggregate(total=Sum('premio_potencial'))['total'] or 0
-            
+            # Usar el acumulado_actual del modelo para consistencia
+            acumulado = float(tope.acumulado_actual or 0)
+
             if acumulado + premio > float(tope.tope_maximo):
                 maximo_permitido = float(tope.tope_maximo) - acumulado
                 return JsonResponse({
