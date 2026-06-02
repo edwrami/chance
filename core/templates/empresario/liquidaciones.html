@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Liquidaciones{% endblock %}
+{% comment %}Cache fix v2{% endcomment %}
 {% block content %}
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
     <h2 class="mb-2 mb-md-0">Liquidaciones de Chanceros</h2>
@@ -50,7 +51,7 @@
                                 <td>${{ liquidacion.total_ventas|floatformat:0 }}</td>
                                 <td>{{ liquidacion.comision_porcentaje|floatformat:2 }}%</td>
                                 <td class="text-success">${{ liquidacion.comision_valor|floatformat:0 }}</td>
-                                <td class="text-primary">${{ liquidacion.total_ventas|add:liquidacion.comision_valor|neg|floatformat:0 }}</td>
+                                <td class="text-primary">${{ liquidacion.valor_empresario|floatformat:0 }}</td>
                                 <td>
                                     {% if liquidacion.estado == 'solicitada' %}
                                     <span class="badge bg-warning">Solicitada</span>
