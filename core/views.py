@@ -2154,7 +2154,8 @@ class ApuestaCreateView(View):
             return render(request, 'chancero/inactivo.html')
 
         # Loterías disponibles hoy
-        hoy = timezone.now().strftime('%A')
+        ahora_dt = timezone.localtime(timezone.now())
+        hoy = ahora_dt.strftime('%A')
         dias_map = {
             'Monday': 'Lunes', 'Tuesday': 'Martes', 'Wednesday': 'Miércoles',
             'Thursday': 'Jueves', 'Friday': 'Viernes', 'Saturday': 'Sábado',
@@ -2168,14 +2169,16 @@ class ApuestaCreateView(View):
             activa=True
         )
 
-        # Depuración: mostrar todas las loterías activas temporalmente
-        loterias_filtradas = list(loterias)
-
-        # Filtrar por día habilitado (manejo de JSONField)
-        # loterias_filtradas = []
-        # for loteria in loterias:
-        #     if isinstance(loteria.dias_habilitados, list) and dia_hoy in loteria.dias_habilitados:
-        #         loterias_filtradas.append(loteria)
+        loterias_filtradas = []
+        hora_actual = ahora_dt.time()
+        for loteria in loterias:
+            dias = loteria.dias_habilitados or []
+            if isinstance(dias, str):
+                dias = [dias]
+            dia_habilitado = dia_hoy in dias
+            horario_valido = loteria.hora_apertura <= hora_actual <= loteria.hora_cierre
+            if dia_habilitado and horario_valido:
+                loterias_filtradas.append(loteria)
 
         context = {
             'loterias': loterias_filtradas,
@@ -2205,23 +2208,23 @@ class ApuestaCreateView(View):
             }, status=400)
         
         # Validar hora
-        ahora = timezone.now().time()
+        ahora = timezone.localtime(timezone.now()).time()
         if not (loteria.hora_apertura <= ahora <= loteria.hora_cierre):
             return JsonResponse({
                 'error': f'Fuera de horario. Horario: {loteria.hora_apertura} - {loteria.hora_cierre}'
             }, status=400)
-        
-        # Obtener multiplicador
+
+        # Obtener premio por peso
         try:
             plan = PlanPremio.objects.get(
                 empresario=request.user.empresario,
-                loteria=loteria,
-                cifras=cifras
+                cifras=cifras,
+                es_combinado=False
             )
-            premio = monto * float(plan.multiplicador)
-        except:
-            return JsonResponse({'error': 'No hay plan de premios para esta lotería'}, status=400)
-        
+            premio = monto * float(plan.premio_por_peso)
+        except PlanPremio.DoesNotExist:
+            return JsonResponse({'error': f'No hay plan de premios configurado para {cifras} cifras'}, status=400)
+
         # Validar tope por LOTERÍA (NO por número)
         try:
             tope = TopeNumero.objects.get(

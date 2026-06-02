@@ -83,7 +83,7 @@
                                 <td>{{ liquidacion.fecha_inicio }}</td>
                                 <td>{{ liquidacion.fecha_fin }}</td>
                                 <td>${{ liquidacion.total_ventas|floatformat:0 }}</td>
-                                <td>{{ liquidacion.porcentaje_comision|floatformat:2 }}%</td>
+                                <td>{{ liquidacion.comision_porcentaje|floatformat:2 }}%</td>
                                 <td>${{ liquidacion.comision_valor|floatformat:0 }}</td>
                                 <td>
                                     {% if liquidacion.estado == 'solicitada' %}
