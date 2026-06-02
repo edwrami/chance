@@ -2033,7 +2033,7 @@ class LiquidacionesListView(View):
         from decimal import Decimal
         total_ventas = liquidaciones.aggregate(total=Sum('total_ventas'))['total'] or Decimal('0')
         total_comisiones = liquidaciones.aggregate(total=Sum('comision_valor'))['total'] or Decimal('0')
-        total_retenido = total_ventas - total_comisiones
+        total_retenido = liquidaciones.aggregate(total=Sum('valor_empresario'))['total'] or Decimal('0')
 
         context = {
             'liquidaciones': liquidaciones,
@@ -2582,12 +2582,14 @@ class LiquidacionSolicitarView(View):
     def get(self, request):
         if request.user.rol != 'empresario':
             return redirect('dashboard')
-        
+
         hoy = timezone.now().date()
         fecha_inicio = request.GET.get('fecha_inicio', hoy.strftime('%Y-%m-%d'))
         fecha_fin = request.GET.get('fecha_fin', hoy.strftime('%Y-%m-%d'))
         chanceros = Usuario.objects.filter(rol='chancero', empresario=request.user).order_by('nombres', 'apellidos')
         chanceros_data = []
+
+        from decimal import Decimal
 
         for chancero in chanceros:
             ventas = Apuesta.objects.filter(
@@ -2596,7 +2598,7 @@ class LiquidacionSolicitarView(View):
                 fecha_hora__date__gte=fecha_inicio,
                 fecha_hora__date__lte=fecha_fin,
                 liquidacion_pagada=False
-            ).aggregate(total=Sum('monto_apostado'))['total'] or 0
+            ).aggregate(total=Sum('monto_apostado'))['total'] or Decimal('0')
             apuestas_count = Apuesta.objects.filter(
                 empresario=request.user,
                 chancero=chancero,
@@ -2607,12 +2609,12 @@ class LiquidacionSolicitarView(View):
 
             try:
                 comision = ComisionVendedor.objects.get(empresario=request.user, chancero=chancero)
-                porcentaje = comision.porcentaje
+                porcentaje = float(comision.porcentaje)
             except ComisionVendedor.DoesNotExist:
-                porcentaje = 0
+                porcentaje = 0.0
 
-            comision_valor = ventas * (porcentaje / 100) if porcentaje else 0
-            valor_empresario = ventas - comision_valor
+            comision_valor = float(ventas) * (porcentaje / 100) if porcentaje > 0 else Decimal('0')
+            valor_empresario = float(ventas) - float(comision_valor)
 
             chanceros_data.append({
                 'chancero': chancero,
@@ -2622,7 +2624,7 @@ class LiquidacionSolicitarView(View):
                 'comision_valor': comision_valor,
                 'valor_empresario': valor_empresario,
             })
-        
+
         context = {
             'fecha_inicio': fecha_inicio,
             'fecha_fin': fecha_fin,
@@ -2639,11 +2641,13 @@ class LiquidacionSolicitarView(View):
         fecha_fin = request.POST.get('fecha_fin')
         chancero = get_object_or_404(Usuario, pk=chancero_id, empresario=request.user, rol='chancero')
 
+        from decimal import Decimal
+
         try:
             comision = ComisionVendedor.objects.get(empresario=request.user, chancero=chancero)
-            porcentaje = float(comision.porcentaje)
+            porcentaje = Decimal(str(comision.porcentaje))
         except ComisionVendedor.DoesNotExist:
-            porcentaje = 0.0
+            porcentaje = Decimal('0')
 
         ventas = Apuesta.objects.filter(
             empresario=request.user,
@@ -2651,20 +2655,20 @@ class LiquidacionSolicitarView(View):
             fecha_hora__date__gte=fecha_inicio,
             fecha_hora__date__lte=fecha_fin,
             liquidacion_pagada=False
-        ).aggregate(total=Sum('monto_apostado'))['total'] or 0
+        ).aggregate(total=Sum('monto_apostado'))['total'] or Decimal('0')
 
-        comision_valor = float(ventas) * (porcentaje / 100) if porcentaje > 0 else 0
-        valor_empresario = float(ventas) - comision_valor
+        comision_valor = ventas * (porcentaje / Decimal('100')) if porcentaje > 0 else Decimal('0')
+        valor_empresario = ventas - comision_valor
 
-        from decimal import Decimal
         liquidacion = Liquidacion.objects.create(
             empresario=request.user,
             chancero=chancero,
             fecha_inicio=fecha_inicio,
             fecha_fin=fecha_fin,
-            total_ventas=Decimal(str(ventas)),
-            comision_porcentaje=Decimal(str(porcentaje)),
-            comision_valor=Decimal(str(comision_valor)),
+            total_ventas=ventas,
+            comision_porcentaje=porcentaje,
+            comision_valor=comision_valor,
+            valor_empresario=valor_empresario,
             estado='solicitada',
         )
 

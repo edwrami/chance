@@ -281,14 +281,14 @@ class ComisionVendedor(models.Model):
 
 class Liquidacion(models.Model):
     empresario = models.ForeignKey(
-        Usuario, 
-        on_delete=models.CASCADE, 
+        Usuario,
+        on_delete=models.CASCADE,
         limit_choices_to={'rol': 'empresario'},
         related_name='liquidaciones_empresario'
     )
     chancero = models.ForeignKey(
-        Usuario, 
-        on_delete=models.CASCADE, 
+        Usuario,
+        on_delete=models.CASCADE,
         limit_choices_to={'rol': 'chancero'},
         related_name='liquidaciones_chancero'
     )
@@ -297,7 +297,8 @@ class Liquidacion(models.Model):
     total_ventas = models.DecimalField(max_digits=12, decimal_places=2)
     comision_porcentaje = models.DecimalField(max_digits=5, decimal_places=2)
     comision_valor = models.DecimalField(max_digits=12, decimal_places=2)
-    
+    valor_empresario = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
     ESTADOS = (
         ('solicitada', 'Solicitada'),
         ('pagada', 'Pagada'),
@@ -306,11 +307,11 @@ class Liquidacion(models.Model):
     estado = models.CharField(max_length=10, choices=ESTADOS, default='solicitada')
     fecha_solicitud = models.DateTimeField(auto_now_add=True)
     fecha_pago = models.DateTimeField(null=True, blank=True)
-    
+
     class Meta:
         verbose_name = 'Liquidación'
         verbose_name_plural = 'Liquidaciones'
-    
+
     def __str__(self):
         return f"{self.chancero.documento} - ${self.comision_valor}"
 
