@@ -50,7 +50,8 @@
                                 <th>Ventas Pendientes</th>
                                 <th>Apuestas</th>
                                 <th>Comisión %</th>
-                                <th>Valor Comisión</th>
+                                <th>Valor Chancero</th>
+                                <th>Valor Empresario</th>
                                 <th>Acción</th>
                             </tr>
                         </thead>
@@ -61,7 +62,8 @@
                                 <td>${{ item.ventas|floatformat:0 }}</td>
                                 <td>{{ item.apuestas_count }}</td>
                                 <td>{{ item.porcentaje|floatformat:2 }}%</td>
-                                <td>${{ item.comision_valor|floatformat:0 }}</td>
+                                <td class="text-success">${{ item.comision_valor|floatformat:0 }}</td>
+                                <td class="text-primary">${{ item.valor_empresario|floatformat:0 }}</td>
                                 <td>
                                     {% if item.ventas > 0 %}
                                     <form method="post" style="display:inline;">

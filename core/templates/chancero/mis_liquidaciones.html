@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Mis Liquidaciones{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <h2 class="mb-2 mb-md-0">Mis Liquidaciones</h2>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Volver al Dashboard</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Resumen Total</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="alert alert-info mb-0">
+                            <strong>Total Ventas Liquidadas:</strong> ${{ total_ventas|floatformat:0 }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="alert alert-success mb-0">
+                            <strong>Total Comisiones Recibidas:</strong> ${{ total_comisiones|floatformat:0 }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Historial de Mis Liquidaciones</h5>
+            </div>
+            <div class="card-body">
+                {% if liquidaciones %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Fecha Inicio</th>
+                                <th>Fecha Fin</th>
+                                <th>Total Ventas</th>
+                                <th>Comisión %</th>
+                                <th>Valor Recibido</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for liquidacion in liquidaciones %}
+                            <tr>
+                                <td>{{ liquidacion.fecha_inicio }}</td>
+                                <td>{{ liquidacion.fecha_fin }}</td>
+                                <td>${{ liquidacion.total_ventas|floatformat:0 }}</td>
+                                <td>{{ liquidacion.comision_porcentaje|floatformat:2 }}%</td>
+                                <td class="text-success">${{ liquidacion.comision_valor|floatformat:0 }}</td>
+                                <td>
+                                    {% if liquidacion.estado == 'solicitada' %}
+                                    <span class="badge bg-warning">Solicitada</span>
+                                    {% elif liquidacion.estado == 'pagada' %}
+                                    <span class="badge bg-success">Pagada</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Cancelada</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No tienes liquidaciones registradas.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

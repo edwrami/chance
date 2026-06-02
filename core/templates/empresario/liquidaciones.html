@@ -3,10 +3,22 @@
 {% block content %}
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
     <h2 class="mb-2 mb-md-0">Liquidaciones de Chanceros</h2>
-    <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Volver al Dashboard</a>
+    <div class="d-flex flex-column flex-md-row gap-2">
+        <a href="{% url 'liquidaciones_solicitar' %}" class="btn btn-success w-100 w-md-auto">Nueva Liquidación</a>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Volver al Dashboard</a>
+    </div>
 </div>
 
-<div class="row">
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="row mb-4">
     <div class="col-12">
         <div class="card">
             <div class="card-header">
@@ -23,7 +35,8 @@
                                 <th>Fecha Fin</th>
                                 <th>Total Ventas</th>
                                 <th>Comisión %</th>
-                                <th>Valor Comisión</th>
+                                <th>Valor Chancero</th>
+                                <th>Valor Empresario</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -35,8 +48,9 @@
                                 <td>{{ liquidacion.fecha_inicio }}</td>
                                 <td>{{ liquidacion.fecha_fin }}</td>
                                 <td>${{ liquidacion.total_ventas|floatformat:0 }}</td>
-                                <td>{{ liquidacion.porcentaje_comision|floatformat:2 }}%</td>
-                                <td>${{ liquidacion.comision_valor|floatformat:0 }}</td>
+                                <td>{{ liquidacion.comision_porcentaje|floatformat:2 }}%</td>
+                                <td class="text-success">${{ liquidacion.comision_valor|floatformat:0 }}</td>
+                                <td class="text-primary">${{ liquidacion.total_ventas|add:liquidacion.comision_valor|neg|floatformat:0 }}</td>
                                 <td>
                                     {% if liquidacion.estado == 'solicitada' %}
                                     <span class="badge bg-warning">Solicitada</span>
@@ -58,6 +72,40 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Resumen Total</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-3">
+                                        <div class="alert alert-info mb-0">
+                                            <strong>Total Ventas:</strong> ${{ total_ventas|floatformat:0 }}
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <div class="alert alert-success mb-0">
+                                            <strong>Total Comisiones Pagadas:</strong> ${{ total_comisiones|floatformat:0 }}
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <div class="alert alert-primary mb-0">
+                                            <strong>Total Retenido Empresario:</strong> ${{ total_retenido|floatformat:0 }}
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <div class="alert alert-secondary mb-0">
+                                            <strong>Total Liquidaciones:</strong> {{ liquidaciones|length }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 {% else %}
                 <p class="text-muted">No hay liquidaciones registradas.</p>

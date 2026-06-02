@@ -2023,12 +2023,23 @@ class LiquidacionesListView(View):
     def get(self, request):
         if request.user.rol != 'empresario':
             return redirect('dashboard')
-        
+
         liquidaciones = Liquidacion.objects.filter(
             empresario=request.user
         ).select_related('chancero').order_by('-fecha_solicitud')
-        
-        return render(request, 'empresario/liquidaciones.html', {'liquidaciones': liquidaciones})
+
+        # Calcular totales
+        total_ventas = liquidaciones.aggregate(total=Sum('total_ventas'))['total'] or 0
+        total_comisiones = liquidaciones.aggregate(total=Sum('comision_valor'))['total'] or 0
+        total_retenido = total_ventas - total_comisiones
+
+        context = {
+            'liquidaciones': liquidaciones,
+            'total_ventas': total_ventas,
+            'total_comisiones': total_comisiones,
+            'total_retenido': total_retenido,
+        }
+        return render(request, 'empresario/liquidaciones.html', context)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -2531,30 +2542,19 @@ class MiLiquidacionView(View):
     def get(self, request):
         if request.user.rol != 'chancero':
             return redirect('dashboard')
-        
+
         liquidaciones = Liquidacion.objects.filter(
             chancero=request.user
         ).order_by('-fecha_solicitud')
-        
-        # Ventas del mes actual
-        ventas_mes = Apuesta.objects.filter(
-            chancero=request.user,
-            fecha_hora__month=timezone.now().month
-        ).aggregate(total=Sum('monto_apostado'))['total'] or 0
-        
-        try:
-            comision = ComisionVendedor.objects.get(chancero=request.user)
-            porcentaje = comision.porcentaje
-            comision_mes = ventas_mes * (porcentaje / 100)
-        except:
-            porcentaje = 0
-            comision_mes = 0
-        
+
+        # Calcular totales del chancero
+        total_ventas = liquidaciones.aggregate(total=Sum('total_ventas'))['total'] or 0
+        total_comisiones = liquidaciones.aggregate(total=Sum('comision_valor'))['total'] or 0
+
         context = {
             'liquidaciones': liquidaciones,
-            'ventas_mes': ventas_mes,
-            'porcentaje': porcentaje,
-            'comision_mes': comision_mes,
+            'total_ventas': total_ventas,
+            'total_comisiones': total_comisiones,
         }
         return render(request, 'chancero/mis_liquidaciones.html', context)
 
@@ -2607,12 +2607,16 @@ class LiquidacionSolicitarView(View):
             except ComisionVendedor.DoesNotExist:
                 porcentaje = 0
 
+            comision_valor = ventas * (porcentaje / 100) if porcentaje else 0
+            valor_empresario = ventas - comision_valor
+
             chanceros_data.append({
                 'chancero': chancero,
                 'ventas': ventas,
                 'apuestas_count': apuestas_count,
                 'porcentaje': porcentaje,
-                'comision_valor': ventas * (porcentaje / 100) if porcentaje else 0,
+                'comision_valor': comision_valor,
+                'valor_empresario': valor_empresario,
             })
         
         context = {
@@ -2646,6 +2650,7 @@ class LiquidacionSolicitarView(View):
         ).aggregate(total=Sum('monto_apostado'))['total'] or 0
 
         comision_valor = ventas * (porcentaje / 100) if porcentaje else 0
+        valor_empresario = ventas - comision_valor
 
         liquidacion = Liquidacion.objects.create(
             empresario=request.user,
@@ -2665,7 +2670,10 @@ class LiquidacionSolicitarView(View):
             fecha_hora__date__lte=fecha_fin,
             liquidacion_pagada=False
         ).update(liquidacion=liquidacion)
-        
+
+        from django.contrib import messages
+        messages.success(request, f'Chancero {chancero.nombres} {chancero.apellidos} liquidado exitosamente. Comisión: ${comision_valor:,.0f}')
+
         return redirect('liquidaciones_list')
 
 
