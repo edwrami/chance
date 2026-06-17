@@ -521,7 +521,7 @@ class ChanceroCreateView(View):
             observaciones=data.get('observaciones', ''),
             rol='chancero',
             empresario=request.user,
-            activo=False,
+            activo=True,
         )
         usuario.set_password(password)
         usuario.save()
