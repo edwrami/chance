@@ -156,3 +156,53 @@ class FacturaComisionAdmin(admin.ModelAdmin):
     list_filter = ('estado', 'empresario')
     search_fields = ('empresario__documento',)
     readonly_fields = ('fecha_generacion',)
+
+
+# ========== ADMIN PARA RESULTADO LOTERIA ==========
+
+@admin.register(ResultadoLoteria)
+class ResultadoLoteriaAdmin(admin.ModelAdmin):
+    list_display = ('loteria', 'fecha', 'numero_ganador', 'cifras', 'creado_por')
+    list_filter = ('loteria', 'fecha')
+    search_fields = ('numero_ganador', 'loteria__nombre')
+    readonly_fields = ('created_at',)
+
+
+# ========== ADMIN PARA ACUMULADO NUMERO ==========
+
+@admin.register(AcumuladoNumero)
+class AcumuladoNumeroAdmin(admin.ModelAdmin):
+    list_display = ('loteria', 'numero', 'cifras', 'monto_acumulado', 'fecha_ultima_apuesta')
+    list_filter = ('loteria', 'cifras')
+    search_fields = ('numero', 'loteria__nombre')
+    readonly_fields = ('fecha_ultima_apuesta',)
+
+
+# ========== ADMIN PARA CLIENTE ==========
+
+@admin.register(Cliente)
+class ClienteAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'telefono', 'chancero', 'activo', 'fecha_registro')
+    list_filter = ('activo', 'chancero')
+    search_fields = ('nombre', 'telefono', 'chancero__documento')
+    readonly_fields = ('fecha_registro',)
+
+
+# ========== ADMIN PARA HISTORIAL CLIENTE ==========
+
+@admin.register(HistorialCliente)
+class HistorialClienteAdmin(admin.ModelAdmin):
+    list_display = ('cliente', 'apuesta', 'fecha_registro')
+    list_filter = ('cliente', 'fecha_registro')
+    search_fields = ('cliente__nombre', 'apuesta__numero')
+    readonly_fields = ('fecha_registro',)
+
+
+# ========== ADMIN PARA PAGO PREMIO ==========
+
+@admin.register(PagoPremio)
+class PagoPremioAdmin(admin.ModelAdmin):
+    list_display = ('apuesta', 'monto_pagado', 'fecha_pago', 'pagado_por')
+    list_filter = ('fecha_pago', 'pagado_por')
+    search_fields = ('apuesta__numero', 'pagado_por__documento')
+    readonly_fields = ('fecha_pago',)
