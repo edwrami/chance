@@ -26,6 +26,7 @@ urlpatterns = [
     path('empresario/chanceros/<int:pk>/', views.ChanceroDetailView.as_view(), name='chancero_detail'),
     path('empresario/chanceros/<int:pk>/toggle/', views.ChanceroToggleActivoView.as_view(), name='chancero_toggle'),
     path('empresario/chanceros/<int:pk>/update/', views.ChanceroUpdateView.as_view(), name='chancero_update'),
+    path('empresario/chanceros/<int:pk>/delete/', views.ChanceroDeleteView.as_view(), name='chancero_delete'),
     path('empresario/chanceros/<int:pk>/comision/', views.ComisionVendedorUpdateView.as_view(), name='comision_update'),
     
     # Empresario - Loterías

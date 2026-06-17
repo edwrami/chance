@@ -581,12 +581,24 @@ class ChanceroToggleActivoView(View):
     def post(self, request, pk):
         if request.user.rol != 'empresario':
             return redirect('dashboard')
-        
+
         chancero = get_object_or_404(Usuario, pk=pk, rol='chancero', empresario=request.user)
         chancero.activo = not chancero.activo
         chancero.save()
-        
+
         return redirect('chancero_detail', pk=pk)
+
+
+@method_decorator(login_required, name='dispatch')
+class ChanceroDeleteView(View):
+    def post(self, request, pk):
+        if request.user.rol != 'empresario':
+            return redirect('dashboard')
+
+        chancero = get_object_or_404(Usuario, pk=pk, rol='chancero', empresario=request.user)
+        chancero.delete()
+
+        return redirect('chanceros_list')
 
 
 @method_decorator(login_required, name='dispatch')

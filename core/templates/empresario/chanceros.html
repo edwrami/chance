@@ -16,7 +16,7 @@
                 <h5>Lista de Chanceros</h5>
             </div>
             <div class="card-body">
-                {% if chanceros %}
+                {% if chanceros_data %}
                 <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead>
@@ -46,11 +46,16 @@
                                 <td>
                                     <div class="d-flex gap-1 flex-wrap">
                                         <a href="{% url 'chancero_detail' item.chancero.id %}" class="btn btn-sm btn-info">Ver</a>
+                                        <a href="{% url 'chancero_update' item.chancero.id %}" class="btn btn-sm btn-primary">Editar</a>
                                         <form method="post" action="{% url 'chancero_toggle' item.chancero.id %}" style="display:inline;">
                                             {% csrf_token %}
                                             <button type="submit" class="btn btn-sm btn-warning">
                                                 {% if item.chancero.activo %}Desactivar{% else %}Activar{% endif %}
                                             </button>
+                                        </form>
+                                        <form method="post" action="{% url 'chancero_delete' item.chancero.id %}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de eliminar este chancero?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
                                         </form>
                                     </div>
                                 </td>
