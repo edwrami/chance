@@ -1,7 +1,6 @@
 {
   "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput"
+    "builder": "NIXPACKS"
   },
   "deploy": {
     "startCommand": "python manage.py migrate --noinput && gunicorn chancepro.wsgi:application --bind 0.0.0.0:$PORT",
