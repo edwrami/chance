@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% block title %}Panel Chancero{% endblock %}
 {% block content %}
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
@@ -582,7 +582,7 @@ function generarMensajeApuestas() {
     
     const total = apuestasAgregadas.reduce((sum, a) => sum + a.monto, 0);
     mensaje += `💵 Total Apostado: $${total}\n`;
-    mensaje += `📞 Chancero: ${document.getElementById('telefono_cliente').value}`;
+
     
     return mensaje;
 }
