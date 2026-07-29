@@ -1,4 +1,4 @@
-﻿from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from .managers import UsuarioManager
@@ -51,6 +51,14 @@ class Usuario(AbstractUser):
     # Configuración del empresario (nombre comercial, logo, etc)
     configuracion = models.JSONField(default=dict, blank=True)
     
+    # Comisión del Administrador General (porcentaje sobre ventas brutas, aplicable a empresarios)
+    comision_admin_porcentaje = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        default=0, 
+        help_text="Porcentaje de comisión que cobra el Admin sobre las ventas brutas del empresario"
+    )
+    
     # Límite de chanceros por empresario (fijado por admin general)
     limite_chanceros = models.PositiveSmallIntegerField(default=10, null=True, blank=True)
     
@@ -82,6 +90,30 @@ class Usuario(AbstractUser):
     
     def __str__(self):
         return f"{self.nombres} {self.apellidos} - {self.documento}"
+
+
+class TwilioCredentials(models.Model):
+    empresario = models.OneToOneField(
+        Usuario,
+        on_delete=models.CASCADE,
+        limit_choices_to={'rol': 'empresario'},
+        related_name='twilio_credentials'
+    )
+    account_sid = models.CharField(max_length=64, help_text='Twilio Account SID')
+    api_key_sid = models.CharField(max_length=64, help_text='Twilio API Key SID (empieza con SK)')
+    api_key_secret = models.CharField(max_length=64, help_text='Twilio API Key Secret')
+    sms_number = models.CharField(max_length=20, help_text='Formato E.164, ej. +12345678901')
+    whatsapp_number = models.CharField(
+        max_length=30,
+        blank=True,
+        null=True,
+        help_text='Número de sandbox de WhatsApp, ej. whatsapp:+14155238886'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Credenciales Twilio de {self.empresario.nombres} {self.empresario.apellidos}"
 
 
 class Loteria(models.Model):

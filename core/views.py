@@ -330,6 +330,7 @@ class EmpresarioCreateView(View):
             activo=True,
             fecha_afiliacion=data.get('fecha_afiliacion') or None,
             fecha_vencimiento=data.get('fecha_vencimiento') or None,
+            comision_admin_porcentaje=data.get('comision_admin_porcentaje') or 0,
         )
         usuario.set_password(password)
         usuario.save()
@@ -348,11 +349,30 @@ class EmpresarioDetailView(View):
         # Chanceros del empresario
         chanceros = Usuario.objects.filter(empresario=empresario, rol='chancero')
         total_chanceros = chanceros.count()
+        total_operarios = total_chanceros
+        
+        # Calcular ventas de hoy de este empresario y la ganancia del admin
+        from django.utils import timezone
+        from django.db.models import Sum
+        from .models import Apuesta
+        
+        hoy = timezone.localtime(timezone.now()).date()
+        ventas_hoy = Apuesta.objects.filter(
+            empresario=empresario,
+            fecha_hora__date=hoy
+        ).aggregate(total=Sum('monto_apostado'))['total'] or 0
+        
+        # Ganancia del admin
+        porcentaje_admin = empresario.comision_admin_porcentaje
+        ganancia_admin_hoy = (float(ventas_hoy) * float(porcentaje_admin)) / 100.0 if porcentaje_admin else 0
         
         context = {
             'empresario': empresario,
             'chanceros': chanceros,
             'total_chanceros': total_chanceros,
+            'total_operarios': total_operarios,
+            'ventas_hoy': ventas_hoy,
+            'ganancia_admin_hoy': ganancia_admin_hoy,
         }
         return render(request, 'admin/empresario_detail.html', context)
 
@@ -386,6 +406,13 @@ class EmpresarioUpdateView(View):
         empresario.limite_chanceros = int(data.get('limite_chanceros', 10))
         empresario.telefono_familiar = data.get('telefono_familiar')
         empresario.activo = data.get('activo') == 'on'
+        
+        # Save comision_admin_porcentaje if provided
+        comision = data.get('comision_admin_porcentaje')
+        if comision is not None and comision != '':
+            empresario.comision_admin_porcentaje = float(comision)
+        else:
+            empresario.comision_admin_porcentaje = 0
         
         # Si se proporciona nueva contraseña, actualizarla
         nueva_password = data.get('password')
@@ -2571,28 +2598,38 @@ class EnviarMensajeView(View):
         
         apuesta = get_object_or_404(Apuesta, pk=apuesta_id, chancero=request.user)
         
-        # Crear mensaje (simulado)
-        contenido = f"ChancePro - Apuesta registrada\n"
+        # Buscar credenciales del empresario
+        empresario = request.user.empresario
+        if not empresario:
+            return JsonResponse({'error': 'No tienes un empresario asignado.'}, status=400)
+            
+        try:
+            creds = empresario.twilio_credentials
+        except Exception:
+            return JsonResponse({'error': 'El empresario no ha configurado el servicio de mensajería (Twilio).'}, status=400)
+        
+        # Crear mensaje de texto
+        contenido = f"DinnerPro - Apuesta registrada\n"
         contenido += f"Lotería: {apuesta.loteria.nombre}\n"
         contenido += f"Número: {apuesta.numero}\n"
         contenido += f"Monto: ${apuesta.monto_apostado:,.0f}\n"
         contenido += f"Premio: ${apuesta.premio_potencial:,.0f}\n"
         contenido += f"Fecha: {apuesta.fecha_hora.strftime('%Y-%m-%d %H:%M')}"
         
-        mensaje = Mensaje(
-            empresario=request.user.empresario,
-            chancero=request.user,
-            apuesta=apuesta,
-            telefono_destino=telefono,
-            contenido=contenido,
-            tipo=tipo
-        )
-        mensaje.save()
+        # Enviar vía Twilio
+        from core.services.messaging import send_sms, send_whatsapp
         
-        # Simular envío (en producción aquí iría la integración real)
+        if tipo == 'whatsapp':
+            res = send_whatsapp(creds, telefono, contenido)
+        else:
+            res = send_sms(creds, telefono, contenido)
+            
+        if not res.get('success'):
+            return JsonResponse({'error': res.get('error', 'Error desconocido al enviar mensaje.')}, status=500)
+        
         return JsonResponse({
             'success': True,
-            'mensaje': 'Mensaje enviado correctamente',
+            'mensaje': 'Mensaje enviado correctamente vía Twilio',
             'contenido': contenido
         })
 
@@ -3246,3 +3283,80 @@ class GenerarQRView(View):
         response = HttpResponse(buffer.read(), content_type='image/png')
         response['Content-Disposition'] = f'attachment; filename=qr_{apuesta_id}.png'
         return response
+
+
+@method_decorator(login_required, name='dispatch')
+class EnviarMensajeTextoView(View):
+    def post(self, request):
+        if request.user.rol != 'chancero':
+            return JsonResponse({'error': 'No autorizado'}, status=403)
+            
+        data = json.loads(request.body)
+        telefono = data.get('telefono')
+        contenido = data.get('contenido')
+        tipo = data.get('tipo', 'whatsapp')
+        
+        # Buscar credenciales del empresario
+        empresario = request.user.empresario
+        if not empresario:
+            return JsonResponse({'error': 'No tienes un empresario asignado.'}, status=400)
+            
+        try:
+            creds = empresario.twilio_credentials
+        except Exception:
+            return JsonResponse({'error': 'El empresario no ha configurado el servicio de mensajería (Twilio).'}, status=400)
+            
+        # Enviar vía Twilio
+        from core.services.messaging import send_sms, send_whatsapp
+        
+        if tipo == 'whatsapp':
+            res = send_whatsapp(creds, telefono, contenido)
+        else:
+            res = send_sms(creds, telefono, contenido)
+            
+        if not res.get('success'):
+            return JsonResponse({'error': res.get('error', 'Error desconocido al enviar mensaje.')}, status=500)
+            
+        return JsonResponse({
+            'success': True,
+            'mensaje': 'Mensaje enviado correctamente vía Twilio'
+        })
+
+
+@method_decorator(login_required, name='dispatch')
+class TwilioConfiguracionView(View):
+    def get(self, request):
+        if request.user.rol != 'empresario':
+            return redirect('dashboard')
+            
+        from .forms import TwilioCredentialsForm
+        from .models import TwilioCredentials
+        
+        try:
+            instance = request.user.twilio_credentials
+        except TwilioCredentials.DoesNotExist:
+            instance = None
+            
+        form = TwilioCredentialsForm(instance=instance)
+        return render(request, 'empresario/twilio_config.html', {'form': form})
+
+    def post(self, request):
+        if request.user.rol != 'empresario':
+            return redirect('dashboard')
+            
+        from .forms import TwilioCredentialsForm
+        from .models import TwilioCredentials
+        
+        try:
+            instance = request.user.twilio_credentials
+        except TwilioCredentials.DoesNotExist:
+            instance = None
+            
+        form = TwilioCredentialsForm(request.POST, instance=instance)
+        if form.is_valid():
+            creds = form.save(commit=False)
+            creds.empresario = request.user
+            creds.save()
+            return redirect('dashboard')
+            
+        return render(request, 'empresario/twilio_config.html', {'form': form})

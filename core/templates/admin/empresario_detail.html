@@ -77,18 +77,30 @@
         </div>
         
         <div class="card mt-3">
-            <div class="card-header">
-                <h5>Configuración</h5>
+            <div class="card-header bg-success text-white">
+                <h5>Configuración y Finanzas (Hoy)</h5>
             </div>
             <div class="card-body">
                 <table class="table table-borderless">
                     <tr>
-                        <th>Límite de Chanceros:</th>
+                        <th>Límite de Operarios:</th>
                         <td>{{ empresario.limite_chanceros }}</td>
                     </tr>
                     <tr>
-                        <th>Chanceros Actuales:</th>
-                        <td>{{ total_chanceros }}</td>
+                        <th>Operarios Actuales:</th>
+                        <td>{{ total_operarios }}</td>
+                    </tr>
+                    <tr>
+                        <th>Ventas de Hoy (Bruto):</th>
+                        <td class="text-primary font-weight-bold">${{ ventas_hoy|floatformat:0 }}</td>
+                    </tr>
+                    <tr>
+                        <th>Comisión Admin (%):</th>
+                        <td>{{ empresario.comision_admin_porcentaje|default:"0" }}%</td>
+                    </tr>
+                    <tr>
+                        <th>Ganancia Admin (Hoy):</th>
+                        <td class="text-success font-weight-bold h5 mb-0">${{ ganancia_admin_hoy|floatformat:0 }}</td>
                     </tr>
                 </table>
             </div>

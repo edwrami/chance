@@ -23,10 +23,10 @@
                 <input type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin }}">
             </div>
             <div class="col-12 col-md-3">
-                <label class="form-label">Chancero:</label>
+                <label class="form-label">Operario:</label>
                 <select name="chancero" class="form-select">
                     <option value="">Todos</option>
-                    {% for chancero in chanceros %}
+                    {% for chancero in operarios %}
                         <option value="{{ chancero.id }}" {% if chancero_id == chancero.id|stringformat:"s" %}selected{% endif %}>
                             {{ chancero.nombres }} {{ chancero.apellidos }}
                         </option>
@@ -80,7 +80,7 @@
                 <thead>
                     <tr>
                         <th>Fecha</th>
-                        <th>Chancero</th>
+                        <th>Operario</th>
                         <th>Lotería</th>
                         <th>Número</th>
                         <th>Cifras</th>

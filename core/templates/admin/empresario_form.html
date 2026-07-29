@@ -48,8 +48,13 @@
                         <input type="text" name="password" class="form-control" placeholder="Contraseña actual: {{ empresario.password }}">
                     </div>
                     <div class="form-group mt-3">
-                        <label>Límite de Chanceros:</label>
+                        <label>Límite de Operarios:</label>
                         <input type="number" name="limite_chanceros" class="form-control" value="{{ empresario.limite_chanceros }}" required>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label>Comisión del Admin (%):</label>
+                        <input type="number" step="0.01" name="comision_admin_porcentaje" class="form-control" value="{{ empresario.comision_admin_porcentaje|default:"0" }}">
+                        <small class="form-text text-muted">Porcentaje que el administrador cobra sobre las ventas brutas de este empresario.</small>
                     </div>
                     <div class="form-group mt-3">
                         <label>

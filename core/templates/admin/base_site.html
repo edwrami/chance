@@ -1,12 +1,12 @@
 ﻿{% extends "admin/base.html" %}
 {% load static %}
 
-{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | ChancePro{% endblock %}
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | DinnerPro{% endblock %}
 
 {% block branding %}
 <h1 id="site-name">
     <a href="{% url 'admin:index' %}">
-        ChancePro Administración
+        DinnerPro Administración
     </a>
 </h1>
 {% endblock %}
@@ -15,7 +15,7 @@
 
 {% block footer %}
 <div id="footer">
-    <p>ChancePro - Sistema de Gestión de Apuestas © {% now "Y" %}. Todos los derechos reservados.</p>
+    <p>DinnerPro - Sistema de Gestión de Apuestas © {% now "Y" %}. Todos los derechos reservados.</p>
 </div>
 {% endblock %}
 

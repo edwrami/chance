@@ -5,9 +5,9 @@ from django.urls import path
 from django.shortcuts import redirect
 from core.admin_forms import AdminAuthenticationForm
 
-class ChanceProAdminSite(AdminSite):
-    site_header = 'ChancePro Administración'
-    site_title = 'ChancePro'
+class DinnerProAdminSite(AdminSite):
+    site_header = 'DinnerPro Administración'
+    site_title = 'DinnerPro'
     index_title = 'Panel de Control'
     site_url = None
     login_form = AdminAuthenticationForm
@@ -23,4 +23,4 @@ class ChanceProAdminSite(AdminSite):
         return custom_urls + urls
 
 # Crear instancia personalizada
-admin_site = ChanceProAdminSite(name='chancepro_admin')
+admin_site = DinnerProAdminSite(name='chancepro_admin')

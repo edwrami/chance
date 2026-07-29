@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
-{% block title %}Mis Chanceros{% endblock %}
+{% block title %}Mis Operarios{% endblock %}
 {% block content %}
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
-    <h2 class="mb-2 mb-md-0">Mis Chanceros</h2>
+    <h2 class="mb-2 mb-md-0">Mis Operarios</h2>
     <div class="d-flex flex-column flex-md-row gap-2">
         <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Dashboard</a>
-        <a href="{% url 'chancero_create' %}" class="btn btn-primary w-100 w-md-auto">Crear Chancero</a>
+        <a href="{% url 'chancero_create' %}" class="btn btn-primary w-100 w-md-auto">Crear Operario</a>
     </div>
 </div>
 
@@ -13,7 +13,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5>Lista de Chanceros</h5>
+                <h5>Lista de Operarios</h5>
             </div>
             <div class="card-body">
                 {% if chanceros_data %}
@@ -65,8 +65,8 @@
                     </table>
                 </div>
                 {% else %}
-                <p class="text-muted">No tienes chanceros configurados.</p>
-                <a href="{% url 'chancero_create' %}" class="btn btn-primary w-100 w-md-auto">Crear Primer Chancero</a>
+                <p class="text-muted">No tienes operarios configurados.</p>
+                <a href="{% url 'chancero_create' %}" class="btn btn-primary w-100 w-md-auto">Crear Primer Operario</a>
                 {% endif %}
             </div>
         </div>

@@ -70,6 +70,7 @@ urlpatterns = [
     
     # Empresario - Configuración
     path('empresario/config/', views.EmpresarioConfigView.as_view(), name='empresario_config'),
+    path('empresario/config/twilio/', views.TwilioConfiguracionView.as_view(), name='twilio_config'),
     path('empresario/config/retencion/', views.ConfiguracionRetencionView.as_view(), name='configuracion_retencion'),
     path('empresario/limpiar-datos/', views.LimpiarDatosView.as_view(), name='limpiar_datos'),
     
@@ -81,6 +82,7 @@ urlpatterns = [
     path('chancero/apuestas/', views.MisApuestasListView.as_view(), name='mis_apuestas'),
     path('chancero/verificar/', views.VerificarDisponibilidadView.as_view(), name='verificar_disponibilidad'),
     path('chancero/mensaje/enviar/', views.EnviarMensajeView.as_view(), name='enviar_mensaje'),
+    path('chancero/mensaje/enviar-texto/', views.EnviarMensajeTextoView.as_view(), name='enviar_mensaje_texto'),
     path('chancero/liquidaciones/', views.MiLiquidacionView.as_view(), name='mis_liquidaciones'),
     path('chancero/consultar-premio/', views.ConsultarPremioChanceroView.as_view(), name='consultar_premio_chancero'),
     path('chancero/reportes-personales/', views.ReportesPersonalesChanceroView.as_view(), name='reportes_personales_chancero'),

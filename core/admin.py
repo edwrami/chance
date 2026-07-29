@@ -1,4 +1,4 @@
-﻿from django.contrib import admin
+from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
@@ -50,7 +50,7 @@ class UsuarioAdmin(UserAdmin):
             'classes': ('collapse',)
         }),
         ('Configuracion', {
-            'fields': ('configuracion',),
+            'fields': ('configuracion', 'comision_admin_porcentaje', 'limite_chanceros'),
             'classes': ('collapse',)
         }),
         ('Fechas importantes', {
@@ -64,7 +64,7 @@ class UsuarioAdmin(UserAdmin):
             'classes': ('wide',),
             'fields': ('documento', 'nombres', 'apellidos', 'direccion', 'telefono',
                       'telefono_familiar', 'email', 'rol', 'empresario',
-                      'fecha_afiliacion', 'fecha_vencimiento', 'password1', 'password2'),
+                      'fecha_afiliacion', 'fecha_vencimiento', 'comision_admin_porcentaje', 'password1', 'password2'),
         }),
     )
 

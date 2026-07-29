@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
-{% block title %}Detalle Chancero{% endblock %}
+{% block title %}Detalle Operario{% endblock %}
 {% block content %}
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
-    <h2 class="mb-2 mb-md-0">Detalle del Chancero</h2>
+    <h2 class="mb-2 mb-md-0">Detalle del Operario</h2>
     <div class="d-flex flex-column flex-md-row gap-2">
         <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Dashboard</a>
-        <a href="{% url 'chanceros_list' %}" class="btn btn-secondary w-100 w-md-auto">Volver a Chanceros</a>
+        <a href="{% url 'chanceros_list' %}" class="btn btn-secondary w-100 w-md-auto">Volver a Operarios</a>
     </div>
 </div>
 
@@ -13,7 +13,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5>Información del Chancero</h5>
+                <h5>Información del Operario</h5>
             </div>
             <div class="card-body">
                 <div class="row g-3">
@@ -60,7 +60,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Editar Chancero</h5>
+                <h5 class="modal-title">Editar Operario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">

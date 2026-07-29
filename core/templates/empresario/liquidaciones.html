@@ -3,7 +3,7 @@
 {% comment %}Cache fix v2{% endcomment %}
 {% block content %}
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
-    <h2 class="mb-2 mb-md-0">Liquidaciones de Chanceros</h2>
+    <h2 class="mb-2 mb-md-0">Liquidaciones de Operarios</h2>
     <div class="d-flex flex-column flex-md-row gap-2">
         <a href="{% url 'liquidaciones_solicitar' %}" class="btn btn-success w-100 w-md-auto">Nueva Liquidación</a>
         <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 w-md-auto">Volver al Dashboard</a>
@@ -31,12 +31,12 @@
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr>
-                                <th>Chancero</th>
+                                <th>Operario</th>
                                 <th>Fecha Inicio</th>
                                 <th>Fecha Fin</th>
                                 <th>Total Ventas</th>
                                 <th>Comisión %</th>
-                                <th>Valor Chancero</th>
+                                <th>Valor Operario</th>
                                 <th>Valor Empresario</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
