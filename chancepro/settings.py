@@ -1,4 +1,4 @@
-﻿"""
+"""
 Configuración de Django para el proyecto ChancePro.
 """
 
@@ -107,7 +107,7 @@ if DATABASE_URL:
     }
     # Forzar SSL
     DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
-    print(f"✅ Conectando a Supabase")
+    print("Conectando a Supabase")
 else:
     # Fallback a SQLite si no hay DATABASE_URL
     DATABASES = {
@@ -116,7 +116,7 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-    print("⚠️ Usando SQLite local")
+    print("Usando SQLite local")
 
 # =============================================================================
 # MODELO DE USUARIO PERSONALIZADO

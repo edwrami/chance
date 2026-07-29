@@ -1,4 +1,4 @@
-﻿from django.urls import path
+from django.urls import path
 from django.views.generic import TemplateView
 from . import views
 
@@ -10,6 +10,7 @@ urlpatterns = [
     path('logout/', views.LogoutView.as_view(), name='logout'),
     path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
     path('cambiar-contrasena/', views.CambiarContrasenaView.as_view(), name='cambiar_contrasena'),
+    path('panel/', views.DashboardView.as_view(), name='panel'),
     
     # Admin General
     path('panel/empresarios/', views.EmpresariosListView.as_view(), name='empresarios_list'),
